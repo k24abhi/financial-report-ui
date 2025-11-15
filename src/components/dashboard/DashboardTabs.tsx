@@ -1,6 +1,6 @@
 import { FileText, TrendingUp, Grid3x3, Upload, Calculator } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { Deal, GridSection, UploadedFile, CellKey } from "../../types";
+import { Deal, GridSection, UploadedFile, CellKey, FinancialStatementType } from "../../types";
 import { DealsTab } from "./tabs/DealsTab";
 import { FinancialsTab } from "./tabs/FinancialsTab";
 import { DataGridTab } from "./tabs/DataGridTab";
@@ -19,6 +19,8 @@ interface DashboardTabsProps {
   onClearSelection: () => void;
   onAddFiles: (files: UploadedFile[]) => void;
   onRemoveFile: (index: number) => void;
+  onUpdateFileStatementType: (index: number, statementType: FinancialStatementType) => void;
+  onUpdateGridData: (newData: GridSection[]) => void;
 }
 
 export function DashboardTabs({
@@ -32,7 +34,9 @@ export function DashboardTabs({
   onToggleCell,
   onClearSelection,
   onAddFiles,
-  onRemoveFile
+  onRemoveFile,
+  onUpdateFileStatementType,
+  onUpdateGridData
 }: DashboardTabsProps) {
   return (
     <Tabs defaultValue="deals" className="space-y-4">
@@ -76,6 +80,7 @@ export function DashboardTabs({
           onToggleCell={onToggleCell}
           onClearSelection={onClearSelection}
           selectedSum={selectedSum}
+          onUpdateGridData={onUpdateGridData}
         />
       </TabsContent>
 
@@ -84,6 +89,7 @@ export function DashboardTabs({
           files={files}
           onAddFiles={onAddFiles}
           onRemoveFile={onRemoveFile}
+          onUpdateFileStatementType={onUpdateFileStatementType}
         />
       </TabsContent>
 

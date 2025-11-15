@@ -6,7 +6,7 @@ import { CompanyHeader } from "./components/dashboard/CompanyHeader";
 import { KeyMetrics } from "./components/dashboard/KeyMetrics";
 import { DashboardTabs } from "./components/dashboard/DashboardTabs";
 import { companies as initialCompanies, mockGridData } from "./data/mockData";
-import { Company, UploadedFile, CellKey, NewCompanyForm } from "./types";
+import { Company, UploadedFile, CellKey, NewCompanyForm, FinancialStatementType, GridSection } from "./types";
 
 export default function App() {
   const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(1);
@@ -14,13 +14,14 @@ export default function App() {
   const [companiesList, setCompaniesList] = useState<Company[]>(initialCompanies);
   
   // Grid features
+  const [gridData, setGridData] = useState<GridSection[]>(mockGridData);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set(["rev", "opex", "addback"]));
   const [selectedCells, setSelectedCells] = useState<Set<CellKey>>(new Set());
   
   // Upload features
   const [files, setFiles] = useState<UploadedFile[]>([
-    { name: "P&L_2024.pdf", size: 1024*1024*2.1, type:"application/pdf", status: "parsed" },
-    { name: "STR_Report_Q3_2025.pdf", size: 1024*640, type:"application/pdf", status: "parsed" },
+    { name: "P&L_2024.pdf", size: 1024*1024*2.1, type:"application/pdf", status: "parsed", statementType: "Annual" },
+    { name: "STR_Report_Q3_2025.pdf", size: 1024*640, type:"application/pdf", status: "parsed", statementType: "Q3" },
   ]);
 
   const selectedCompany = useMemo(() => {
@@ -66,7 +67,7 @@ export default function App() {
     let sum = 0;
     selectedCells.forEach(key => {
       const [rowId, period] = key.split(":");
-      mockGridData.forEach(section => {
+      gridData.forEach(section => {
         if (section.children) {
           const row = section.children.find(r => r.id === rowId);
           if (row && period in row) {
@@ -76,7 +77,7 @@ export default function App() {
       });
     });
     return sum;
-  }, [selectedCells]);
+  }, [selectedCells, gridData]);
 
   // File management functions
   const handleAddFiles = (newFiles: UploadedFile[]) => {
@@ -85,6 +86,18 @@ export default function App() {
 
   const handleRemoveFile = (idx: number) => {
     setFiles(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  const handleUpdateFileStatementType = (idx: number, statementType: FinancialStatementType) => {
+    setFiles(prev => prev.map((file, i) => 
+      i === idx ? { ...file, statementType } : file
+    ));
+  };
+
+  const handleUpdateGridData = (newData: GridSection[]) => {
+    setGridData(newData);
+    // Clear selected cells when grid data changes to avoid invalid selections
+    setSelectedCells(new Set());
   };
 
   // Add company function
@@ -128,7 +141,7 @@ export default function App() {
 
               <DashboardTabs
                 deals={filteredDeals}
-                gridData={mockGridData}
+                gridData={gridData}
                 expandedRows={expandedRows}
                 selectedCells={selectedCells}
                 files={files}
@@ -138,6 +151,8 @@ export default function App() {
                 onClearSelection={clearCellSelection}
                 onAddFiles={handleAddFiles}
                 onRemoveFile={handleRemoveFile}
+                onUpdateFileStatementType={handleUpdateFileStatementType}
+                onUpdateGridData={handleUpdateGridData}
               />
             </div>
           ) : (
