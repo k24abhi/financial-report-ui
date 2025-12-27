@@ -15,6 +15,7 @@ interface DashboardTabsProps {
   selectedCells: Set<CellKey>;
   files: UploadedFile[];
   selectedSum: number;
+  companyId?: string;
   onToggleRow: (id: string) => void;
   onToggleCell: (cellKey: CellKey) => void;
   onClearSelection: () => void;
@@ -29,6 +30,7 @@ export function DashboardTabs({
   selectedCells,
   files,
   selectedSum,
+  companyId,
   onToggleRow,
   onToggleCell,
   onClearSelection,
@@ -89,11 +91,12 @@ export function DashboardTabs({
           files={files}
           onAddFiles={onAddFiles}
           onRemoveFile={onRemoveFile}
+          companyId={companyId}
         />
       </TabsContent>
 
       <TabsContent value="extraction">
-        <EditExtractionTab />
+        <EditExtractionTab companyId={companyId} files={files} />
       </TabsContent>
 
       <TabsContent value="analysis">

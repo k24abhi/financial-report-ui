@@ -42,6 +42,12 @@ export interface UploadedFile {
   size: number;
   type: string;
   status: string;
+  period?: string;
+  date?: string;
+  period_type?: string;
+  file?: File;
+  company_id?: string;
+  extractedData?: any;
 }
 
 export interface NewCompanyForm {
