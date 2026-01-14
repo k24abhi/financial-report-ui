@@ -37,11 +37,17 @@ export interface GridSection {
   children: GridRow[];
 }
 
+export type FinancialStatementType =
+  | 'Q1' | 'Q2' | 'Q3' | 'Q4'  // Quarterly
+  | 'H1' | 'H2'                // Half-yearly 
+  | 'Annual';                  // Annual
+
 export interface UploadedFile {
   name: string;
   size: number;
   type: string;
   status: string;
+  statementType?: FinancialStatementType;
   period?: string;
   date?: string;
   period_type?: string;
