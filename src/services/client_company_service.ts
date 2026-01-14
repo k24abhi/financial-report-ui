@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = 'https://atomic-leshia-reddy-rentals-c91628b8.koyeb.app';
 
 import type { Company, NewCompanyForm } from '../types';
 

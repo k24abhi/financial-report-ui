@@ -1,5 +1,5 @@
 import { TrendingUp, TrendingDown } from "lucide-react";
-import { Card, CardHeader, CardDescription, CardTitle, CardContent } from "../ui/card";
+import { Card, CardContent, Typography, Box, Grid } from "@mui/material";
 import { formatUSD } from "../../utils/formatters";
 import { Deal } from "../../types";
 
@@ -15,66 +15,84 @@ export function KeyMetrics({ deals }: KeyMetricsProps) {
   const total = deals.length;
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <Card>
-        <CardHeader className="pb-3">
-          <CardDescription>Total Loan Volume</CardDescription>
-          <CardTitle className="text-2xl">{formatUSD(totalAmount)}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-xs text-neutral-500">
-            Across {total} {total === 1 ? 'deal' : 'deals'}
-          </div>
-        </CardContent>
-      </Card>
+    <Grid container spacing={2}>
+      <Grid size={{ xs: 12, md: 6, lg: 3 }}>
+        <Card>
+          <CardContent>
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              Total Loan Volume
+            </Typography>
+            <Typography variant="h5" fontWeight={600}>
+              {formatUSD(totalAmount)}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+              Across {total} {total === 1 ? 'deal' : 'deals'}
+            </Typography>
+          </CardContent>
+        </Card>
+      </Grid>
 
-      <Card>
-        <CardHeader className="pb-3">
-          <CardDescription>Approval Rate</CardDescription>
-          <CardTitle className="text-2xl">
-            {((approved / total) * 100).toFixed(0)}%
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-xs text-neutral-500">
-            {approved} of {total} approved/funded
-          </div>
-        </CardContent>
-      </Card>
+      <Grid size={{ xs: 12, md: 6, lg: 3 }}>
+        <Card>
+          <CardContent>
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              Approval Rate
+            </Typography>
+            <Typography variant="h5" fontWeight={600}>
+              {((approved / total) * 100).toFixed(0)}%
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+              {approved} of {total} approved/funded
+            </Typography>
+          </CardContent>
+        </Card>
+      </Grid>
 
-      <Card>
-        <CardHeader className="pb-3">
-          <CardDescription>Avg DSCR</CardDescription>
-          <CardTitle className="text-2xl">{avgDSCR.toFixed(2)}x</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-1 text-xs text-green-600">
-            {avgDSCR > 1.25 ? (
-              <>
-                <TrendingUp className="h-3 w-3" />
-                Strong coverage
-              </>
-            ) : (
-              <>
-                <TrendingDown className="h-3 w-3" />
-                Below threshold
-              </>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <Grid size={{ xs: 12, md: 6, lg: 3 }}>
+        <Card>
+          <CardContent>
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              Avg DSCR
+            </Typography>
+            <Typography variant="h5" fontWeight={600}>
+              {avgDSCR.toFixed(2)}x
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 1 }}>
+              {avgDSCR > 1.25 ? (
+                <>
+                  <TrendingUp style={{ width: 12, height: 12, color: '#16a34a' }} />
+                  <Typography variant="caption" sx={{ color: '#16a34a' }}>
+                    Strong coverage
+                  </Typography>
+                </>
+              ) : (
+                <>
+                  <TrendingDown style={{ width: 12, height: 12, color: '#dc2626' }} />
+                  <Typography variant="caption" sx={{ color: '#dc2626' }}>
+                    Below threshold
+                  </Typography>
+                </>
+              )}
+            </Box>
+          </CardContent>
+        </Card>
+      </Grid>
 
-      <Card>
-        <CardHeader className="pb-3">
-          <CardDescription>Avg LTV</CardDescription>
-          <CardTitle className="text-2xl">{avgLTV.toFixed(0)}%</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-xs text-neutral-500">
-            Loan-to-value ratio
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+      <Grid size={{ xs: 12, md: 6, lg: 3 }}>
+        <Card>
+          <CardContent>
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              Avg LTV
+            </Typography>
+            <Typography variant="h5" fontWeight={600}>
+              {avgLTV.toFixed(0)}%
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+              Loan-to-value ratio
+            </Typography>
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
   );
 }

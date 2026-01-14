@@ -1,6 +1,5 @@
 import { MapPin, Building2, User } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardDescription } from "../ui/card";
-import { Badge } from "../ui/badge";
+import { Card, CardContent, Chip, Box, Typography } from "@mui/material";
 import { Company } from "../../types";
 
 interface CompanyHeaderProps {
@@ -10,28 +9,31 @@ interface CompanyHeaderProps {
 export function CompanyHeader({ company }: CompanyHeaderProps) {
   return (
     <Card>
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="text-2xl">{company.name}</CardTitle>
-            <CardDescription className="mt-2 flex flex-wrap items-center gap-4">
-              <span className="flex items-center gap-1">
-                <MapPin className="h-4 w-4" />
-                {company.location}
-              </span>
-              <span className="flex items-center gap-1">
-                <Building2 className="h-4 w-4" />
-                {company.industry}
-              </span>
-              <span className="flex items-center gap-1">
-                <User className="h-4 w-4" />
-                {company.borrower}
-              </span>
-            </CardDescription>
-          </div>
-          <Badge className="bg-black">{company.type}</Badge>
-        </div>
-      </CardHeader>
+      <CardContent>
+        <Box sx={{ display: 'flex', alignItems: 'start', justifyContent: 'space-between' }}>
+          <Box>
+            <Typography variant="h5" fontWeight={600}>{company.name}</Typography>
+            <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <MapPin style={{ width: 16, height: 16 }} />
+                <Typography variant="body2" color="text.secondary">{company.location}</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <Building2 style={{ width: 16, height: 16 }} />
+                <Typography variant="body2" color="text.secondary">{company.industry}</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <User style={{ width: 16, height: 16 }} />
+                <Typography variant="body2" color="text.secondary">{company.borrower}</Typography>
+              </Box>
+            </Box>
+          </Box>
+          <Chip 
+            label={company.type} 
+            sx={{ bgcolor: 'black', color: 'white' }}
+          />
+        </Box>
+      </CardContent>
     </Card>
   );
 }

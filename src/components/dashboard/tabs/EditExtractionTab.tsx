@@ -1,31 +1,14 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../../ui/card";
-import { Input } from "../../ui/input";
-import { Button } from "../../ui/button";
-import { Badge } from "../../ui/badge";
-import { ScrollArea } from "../../ui/scroll-area";
-import { Label } from "../../ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../ui/select";
+import { Card, CardContent, CardHeader, TextField, Button, Chip, Box, Typography, Select, MenuItem, FormControl, InputLabel, Alert, Badge } from "@mui/material";
 import { Search, Edit2, Download, Upload, Loader2, AlertCircle, RefreshCw, CheckCircle2 } from "lucide-react";
-import { cn } from "../../../lib/utils";
 import { extractDataAPI } from "../../../services/api";
 import { UploadedFile } from "../../../types";
 import tableData from "../../../data/response_1763405559153.json";
 
-interface TableCell {
-  rowIndex: number;
-  columnIndex: number;
-  content: string;
-  rowSpan?: number;
-  columnSpan?: number;
-  kind?: string;
-}
-
-interface Table {
-  rowCount: number;
-  columnCount: number;
-  cells: TableCell[];
-}
+// New data structure: array of tables, each table is array of row objects
+// Row object has keys "0", "1", "2" etc for column values
+type TableRow = Record<string, string>;
+type Table = TableRow[];
 
 interface EditExtractionTabProps {
   companyId?: string;
@@ -109,15 +92,16 @@ export function EditExtractionTab({ companyId = "company_1", files = [] }: EditE
       const updatedTables = tables.map((table, tableIdx) => {
         if (tableIdx !== selectedTable) return table;
 
-        const updatedCells = table.cells.map(cell => {
-          const cellKey = `${cell.rowIndex}-${cell.columnIndex}`;
-          if (cellKey in editedData) {
-            return { ...cell, content: editedData[cellKey] };
-          }
-          return cell;
+        return table.map((row, rowIdx) => {
+          const updatedRow = { ...row };
+          Object.keys(row).forEach(colKey => {
+            const cellKey = `${rowIdx}-${colKey}`;
+            if (cellKey in editedData) {
+              updatedRow[colKey] = editedData[cellKey];
+            }
+          });
+          return updatedRow;
         });
-
-        return { ...table, cells: updatedCells };
       });
 
       // Save to API
@@ -146,311 +130,284 @@ export function EditExtractionTab({ companyId = "company_1", files = [] }: EditE
   const tables = loadedTables;
   const currentTable = tables[selectedTable];
 
-  // Create a 2D grid representation
+  // Convert table data to grid format for display
   const grid = useMemo(() => {
-    if (!currentTable) return [];
+    if (!currentTable || !currentTable.length) return [];
     
-    const { rowCount, columnCount, cells } = currentTable;
-    const gridArray: (TableCell | null)[][] = Array.from({ length: rowCount }, () =>
-      Array(columnCount).fill(null)
-    );
-
-    cells.forEach((cell) => {
-      const { rowIndex, columnIndex, rowSpan = 1, columnSpan = 1 } = cell;
-      
-      // Place the cell and mark spanned cells
-      for (let r = rowIndex; r < rowIndex + rowSpan && r < rowCount; r++) {
-        for (let c = columnIndex; c < columnIndex + columnSpan && c < columnCount; c++) {
-          if (r === rowIndex && c === columnIndex) {
-            gridArray[r][c] = cell;
-          } else {
-            gridArray[r][c] = { ...cell, content: "" }; // Mark as spanned
-          }
-        }
-      }
+    return currentTable.map(row => {
+      // Get all column keys and sort them numerically
+      const colKeys = Object.keys(row).sort((a, b) => parseInt(a) - parseInt(b));
+      return colKeys.map(key => row[key] || "");
     });
-
-    return gridArray;
   }, [currentTable]);
 
-  const getCellContent = (cell: TableCell) => {
-    const cellKey = `${cell.rowIndex}-${cell.columnIndex}`;
-    return editedData[cellKey] ?? cell.content;
+  // Get number of columns
+  const columnCount = useMemo(() => {
+    if (!currentTable || !currentTable.length) return 0;
+    const allKeys = currentTable.flatMap(row => Object.keys(row));
+    const maxKey = Math.max(...allKeys.map(k => parseInt(k)));
+    return maxKey + 1;
+  }, [currentTable]);
+
+  const getCellContent = (rowIdx: number, colIdx: string) => {
+    const cellKey = `${rowIdx}-${colIdx}`;
+    if (cellKey in editedData) return editedData[cellKey];
+    return currentTable[rowIdx]?.[colIdx] || "";
   };
 
-  const handleCellEdit = (cell: TableCell, value: string) => {
-    const cellKey = `${cell.rowIndex}-${cell.columnIndex}`;
+  const handleCellEdit = (rowIdx: number, colIdx: string, value: string) => {
+    const cellKey = `${rowIdx}-${colIdx}`;
     setEditedData({ ...editedData, [cellKey]: value });
   };
 
-  const isEdited = (cell: TableCell) => {
-    const cellKey = `${cell.rowIndex}-${cell.columnIndex}`;
+  const isEdited = (rowIdx: number, colIdx: string) => {
+    const cellKey = `${rowIdx}-${colIdx}`;
     return cellKey in editedData;
   };
 
   return (
-    <div className="space-y-4">
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       {/* Header Controls */}
       <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Document Data Extraction - Edit & Verify</CardTitle>
-              <CardDescription>
-                Review and edit extracted table data from uploaded documents
-              </CardDescription>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="gap-1">
-                <Upload className="h-3 w-3" />
-                {tables.length} Tables Extracted
-              </Badge>
+        <CardHeader
+          title="Document Data Extraction - Edit & Verify"
+          subheader="Review and edit extracted table data from uploaded documents"
+          action={
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Chip
+                icon={<Upload style={{ width: 14, height: 14 }} />}
+                label={`${tables.length} Tables Extracted`}
+                variant="outlined"
+                size="small"
+              />
               <Button
-                variant={isEditMode ? "default" : "outline"}
-                size="sm"
-                className="gap-2"
+                variant={isEditMode ? "contained" : "outlined"}
+                size="small"
                 onClick={() => setIsEditMode(!isEditMode)}
+                startIcon={<Edit2 style={{ width: 16, height: 16 }} />}
               >
-                <Edit2 className="h-4 w-4" />
                 {isEditMode ? "Exit Edit Mode" : "Edit Mode"}
               </Button>
-              <Button variant="outline" size="sm" className="gap-2">
-                <Download className="h-4 w-4" />
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<Download style={{ width: 16, height: 16 }} />}
+              >
                 Export
               </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
+            </Box>
+          }
+        />
+        <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {/* File Selection or Manual Load */}
           {parsedFiles.length > 0 ? (
-            <div className="space-y-2">
-              <Label>Select Parsed File</Label>
-              <Select 
-                value={selectedFileIndex?.toString() || ""} 
-                onValueChange={(val) => setSelectedFileIndex(parseInt(val))}
+            <FormControl fullWidth>
+              <InputLabel>Select Parsed File</InputLabel>
+              <Select
+                value={selectedFileIndex?.toString() || ""}
+                onChange={(e) => setSelectedFileIndex(parseInt(e.target.value as string))}
+                label="Select Parsed File"
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a parsed file" />
-                </SelectTrigger>
-                <SelectContent>
-                  {parsedFiles.map((file, idx) => (
-                    <SelectItem key={idx} value={idx.toString()}>
-                      {file.name} - {file.date} ({file.period_type})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
+                {parsedFiles.map((file, idx) => (
+                  <MenuItem key={idx} value={idx.toString()}>
+                    {file.name} - {file.date} ({file.period_type})
+                  </MenuItem>
+                ))}
               </Select>
-            </div>
+            </FormControl>
           ) : (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-              <p className="text-sm text-amber-700">
-                No parsed files available. Upload and parse documents first, or load by period date below.
-              </p>
-            </div>
+            <Alert severity="warning">
+              No parsed files available. Upload and parse documents first, or load by period date below.
+            </Alert>
           )}
 
           {/* Manual Load by Date */}
-          <Card className="border-blue-200 bg-blue-50/50">
-            <CardContent className="pt-4">
-              <div className="flex items-end gap-3">
-                <div className="flex-1 space-y-2">
-                  <Label htmlFor="load-date">Load by Period Date</Label>
-                  <Input
-                    id="load-date"
-                    type="date"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    className="bg-white"
-                  />
-                </div>
-                <div className="w-40 space-y-2">
-                  <Label htmlFor="load-period">Period Type</Label>
-                  <Select value={selectedPeriodType} onValueChange={setSelectedPeriodType}>
-                    <SelectTrigger id="load-period" className="bg-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Q">Quarterly</SelectItem>
-                      <SelectItem value="A">Annual</SelectItem>
-                      <SelectItem value="M">Monthly</SelectItem>
-                      <SelectItem value="YTD">YTD</SelectItem>
-                    </SelectContent>
+          <Card sx={{ borderColor: 'primary.light', bgcolor: 'primary.50' }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 2 }}>
+                <TextField
+                  label="Load by Period Date"
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  InputLabelProps={{ shrink: true }}
+                  sx={{ flex: 1, bgcolor: 'white' }}
+                />
+                <FormControl sx={{ width: 160, bgcolor: 'white' }}>
+                  <InputLabel>Period Type</InputLabel>
+                  <Select
+                    value={selectedPeriodType}
+                    onChange={(e) => setSelectedPeriodType(e.target.value)}
+                    label="Period Type"
+                  >
+                    <MenuItem value="Q">Quarterly</MenuItem>
+                    <MenuItem value="A">Annual</MenuItem>
+                    <MenuItem value="M">Monthly</MenuItem>
+                    <MenuItem value="YTD">YTD</MenuItem>
                   </Select>
-                </div>
-                <Button 
+                </FormControl>
+                <Button
+                  variant="contained"
                   onClick={handleLoadExtraction}
                   disabled={loading || !selectedDate}
-                  className="gap-2"
+                  startIcon={loading ? <Loader2 style={{ width: 16, height: 16 }} /> : <RefreshCw style={{ width: 16, height: 16 }} />}
                 >
-                  {loading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Loading...
-                    </>
-                  ) : (
-                    <>
-                      <RefreshCw className="h-4 w-4" />
-                      Load Data
-                    </>
-                  )}
+                  {loading ? "Loading..." : "Load Data"}
                 </Button>
-              </div>
+              </Box>
               {error && (
-                <div className="mt-2 flex items-center gap-2 text-sm text-red-600">
-                  <AlertCircle className="h-4 w-4" />
+                <Alert severity="error" sx={{ mt: 2 }} icon={<AlertCircle style={{ width: 16, height: 16 }} />}>
                   {error}
-                </div>
+                </Alert>
               )}
             </CardContent>
           </Card>
 
           {/* Search and Table Selection */}
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
-              <Input
-                placeholder="Search in table..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-neutral-500">Table:</span>
-              <select
-                value={selectedTable}
-                onChange={(e) => setSelectedTable(Number(e.target.value))}
-                className="rounded-md border px-3 py-2 text-sm"
-              >
-                {tables.map((_, idx) => (
-                  <option key={idx} value={idx}>
-                    Table {idx + 1} ({tables[idx].rowCount}×{tables[idx].columnCount})
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <TextField
+              placeholder="Search in table..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: <Search style={{ width: 16, height: 16, marginRight: 8, color: '#999' }} />
+              }}
+              sx={{ flex: 1 }}
+              size="small"
+            />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="body2" color="text.secondary">Table:</Typography>
+              <FormControl size="small" sx={{ minWidth: 200 }}>
+                <Select
+                  value={selectedTable}
+                  onChange={(e) => setSelectedTable(Number(e.target.value))}
+                >
+                  {tables.map((table, idx) => {
+                    const rowCount = table.length;
+                    const colCount = table.length > 0 ? Math.max(...table.map(row => Object.keys(row).length)) : 0;
+                    return (
+                      <MenuItem key={idx} value={idx}>
+                        Table {idx + 1} ({rowCount}×{colCount})
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
+            </Box>
+          </Box>
         </CardContent>
       </Card>
 
       {/* Data Grid */}
       <Card>
-        <CardContent className="p-0">
-          <ScrollArea className="h-[calc(100vh-400px)]">
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
+        <CardContent sx={{ p: 0 }}>
+          <Box sx={{ maxHeight: 'calc(100vh - 400px)', overflow: 'auto' }}>
+            <Box sx={{ overflowX: 'auto' }}>
+              <Box component="table" sx={{ width: '100%', borderCollapse: 'collapse' }}>
                 <tbody>
-                  {grid.map((row, rowIdx) => (
-                    <tr key={rowIdx} className="border-b hover:bg-neutral-50">
-                      {row.map((cell, colIdx) => {
-                        if (!cell) return null;
-                        if (cell.content === "" && (cell.rowIndex !== rowIdx || cell.columnIndex !== colIdx)) {
-                          return null; // Skip spanned cells
-                        }
+                  {currentTable && currentTable.map((row, rowIdx) => {
+                    const colKeys = Object.keys(row).sort((a, b) => parseInt(a) - parseInt(b));
+                    
+                    return (
+                      <tr key={rowIdx} style={{ borderBottom: '1px solid #e0e0e0' }}>
+                        {colKeys.map((colKey) => {
+                          const content = getCellContent(rowIdx, colKey);
+                          const edited = isEdited(rowIdx, colKey);
+                          const highlighted = searchTerm && content.toLowerCase().includes(searchTerm.toLowerCase());
+                          const isHeader = rowIdx === 0; // Treat first row as header
 
-                        const isHeader = cell.kind === "columnHeader";
-                        const content = getCellContent(cell);
-                        const edited = isEdited(cell);
-                        const highlighted = searchTerm && content.toLowerCase().includes(searchTerm.toLowerCase());
+                          const CellTag = isHeader ? "th" : "td";
 
-                        const CellTag = isHeader ? "th" : "td";
-
-                        return (
-                          <CellTag
-                            key={`${rowIdx}-${colIdx}`}
-                            rowSpan={cell.rowSpan || 1}
-                            colSpan={cell.columnSpan || 1}
-                            className={cn(
-                              "border px-3 py-2 text-sm relative",
-                              isHeader && "bg-neutral-100 font-semibold text-center",
-                              highlighted && "bg-yellow-100",
-                              edited && "bg-blue-50 border-blue-300",
-                              isEditMode && !isHeader && "hover:bg-neutral-50"
-                            )}
-                          >
-                            {isEditMode && !isHeader ? (
-                              <Input
-                                value={content}
-                                onChange={(e) => handleCellEdit(cell, e.target.value)}
-                                className="h-8 text-sm border-0 focus-visible:ring-1"
-                              />
-                            ) : (
-                              <div className="flex items-center justify-between gap-2">
-                                <span className="flex-1 whitespace-pre-wrap">
-                                  {content || <span className="text-neutral-300">—</span>}
-                                </span>
-                                {edited && (
-                                  <Badge variant="secondary" className="ml-2 text-xs">
-                                    Edited
-                                  </Badge>
-                                )}
-                              </div>
-                            )}
-                          </CellTag>
-                        );
-                      })}
-                    </tr>
-                  ))}
+                          return (
+                            <CellTag
+                              key={`${rowIdx}-${colKey}`}
+                              style={{
+                                border: '1px solid #e0e0e0',
+                                padding: '8px 12px',
+                                fontSize: '14px',
+                                position: 'relative',
+                                backgroundColor: isHeader ? '#f5f5f5' : highlighted ? '#fff9c4' : edited ? '#e3f2fd' : 'white',
+                                fontWeight: isHeader ? 600 : 400,
+                                textAlign: isHeader ? 'center' : 'left',
+                                borderColor: edited ? '#90caf9' : '#e0e0e0',
+                              }}
+                            >
+                              {isEditMode && !isHeader ? (
+                                <TextField
+                                  value={content}
+                                  onChange={(e) => handleCellEdit(rowIdx, colKey, e.target.value)}
+                                  size="small"
+                                  fullWidth
+                                  variant="standard"
+                                  sx={{ '& .MuiInput-root': { fontSize: '14px' } }}
+                                />
+                              ) : (
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+                                  <span style={{ flex: 1, whiteSpace: 'pre-wrap' }}>
+                                    {content || <span style={{ color: '#ccc' }}>—</span>}
+                                  </span>
+                                  {edited && (
+                                    <Chip label="Edited" size="small" color="secondary" sx={{ ml: 1, fontSize: '10px', height: 20 }} />
+                                  )}
+                                </Box>
+                              )}
+                            </CellTag>
+                          );
+                        })}
+                      </tr>
+                    );
+                  })}
                 </tbody>
-              </table>
-            </div>
-          </ScrollArea>
+              </Box>
+            </Box>
+          </Box>
         </CardContent>
       </Card>
 
       {/* Status Footer */}
       {Object.keys(editedData).length > 0 && (
-        <Card className="border-blue-300 bg-blue-50">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Badge className="bg-blue-600">
-                  {Object.keys(editedData).length} cells modified
-                </Badge>
+        <Card sx={{ borderColor: 'primary.main', bgcolor: 'primary.50' }}>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Chip
+                  label={`${Object.keys(editedData).length} cells modified`}
+                  color="primary"
+                />
                 {saveSuccess ? (
-                  <span className="text-sm text-green-600 flex items-center gap-1">
-                    <CheckCircle2 className="h-4 w-4" />
+                  <Typography variant="body2" sx={{ color: 'success.main', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <CheckCircle2 style={{ width: 16, height: 16 }} />
                     Changes saved successfully
-                  </span>
+                  </Typography>
                 ) : (
-                  <span className="text-sm text-neutral-600">
+                  <Typography variant="body2" color="text.secondary">
                     Remember to save your changes
-                  </span>
+                  </Typography>
                 )}
-              </div>
-              <div className="flex gap-2">
+              </Box>
+              <Box sx={{ display: 'flex', gap: 1 }}>
                 <Button
-                  variant="outline"
-                  size="sm"
+                  variant="outlined"
+                  size="small"
                   onClick={() => setEditedData({})}
                   disabled={saving}
                 >
                   Reset All Changes
                 </Button>
-                <Button 
-                  size="sm" 
-                  className="bg-blue-600 gap-2"
+                <Button
+                  variant="contained"
+                  size="small"
                   onClick={handleSaveChanges}
                   disabled={saving || !selectedDate}
+                  startIcon={saving ? <Loader2 style={{ width: 16, height: 16 }} /> : <Download style={{ width: 16, height: 16 }} />}
                 >
-                  {saving ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      <Download className="h-4 w-4" />
-                      Save Changes
-                    </>
-                  )}
+                  {saving ? "Saving..." : "Save Changes"}
                 </Button>
-              </div>
-            </div>
+              </Box>
+            </Box>
           </CardContent>
         </Card>
       )}
-    </div>
+    </Box>
   );
 }

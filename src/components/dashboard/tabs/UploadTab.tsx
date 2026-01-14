@@ -1,13 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { Upload, FolderOpen, FileText, Eye, Trash, Calendar, Send, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../../ui/card";
-import { Input } from "../../ui/input";
-import { Button } from "../../ui/button";
-import { Badge } from "../../ui/badge";
-import { ScrollArea } from "../../ui/scroll-area";
-import { Label } from "../../ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../ui/select";
-import { cn } from "../../../lib/utils";
+import { Card, CardContent, CardHeader, TextField, Button, Chip, Box, Typography, Select, MenuItem, FormControl, InputLabel, Alert, Badge } from "@mui/material";
 import { UploadedFile, FinancialStatementType } from "../../../types";
 import { extractDataAPI } from "../../../services/api";
 
@@ -108,248 +101,302 @@ export function UploadTab({ files, onAddFiles, onRemoveFile, onUpdateFileStateme
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Document Upload & Management</CardTitle>
-        <CardDescription>Upload and manage documents for this company</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
+      <CardHeader
+        title="Document Upload & Management"
+        subheader="Upload and manage documents for this company"
+      />
+      <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         {/* Period Configuration */}
-        <Card className="border-blue-200 bg-blue-50/50">
-          <CardContent className="pt-6">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="period-date" className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
+        <Card sx={{ borderColor: 'primary.light', bgcolor: 'primary.50' }}>
+          <CardContent>
+            <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' } }}>
+              <Box>
+                <Typography variant="body2" fontWeight={500} gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Calendar style={{ width: 16, height: 16 }} />
                   Period Date
-                </Label>
-                <Input
-                  id="period-date"
+                </Typography>
+                <TextField
                   type="date"
                   value={uploadDate}
                   onChange={(e) => setUploadDate(e.target.value)}
-                  className="bg-white"
-                  placeholder="Select period end date"
+                  fullWidth
+                  sx={{ bgcolor: 'white' }}
+                  InputLabelProps={{ shrink: true }}
+                  helperText="Select the period end date (e.g., 2024-12-31 for Q4 2024)"
                 />
-                <p className="text-xs text-neutral-500">
-                  Select the period end date (e.g., 2024-12-31 for Q4 2024)
-                </p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="period-type">Period Type</Label>
-                <Select value={periodType} onValueChange={setPeriodType}>
-                  <SelectTrigger id="period-type" className="bg-white">
-                    <SelectValue placeholder="Select period type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Q">Quarterly (Q)</SelectItem>
-                    <SelectItem value="A">Annual (A)</SelectItem>
-                    <SelectItem value="M">Monthly (M)</SelectItem>
-                    <SelectItem value="YTD">Year-to-Date (YTD)</SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-neutral-500">
+              </Box>
+              <Box>
+                <FormControl fullWidth sx={{ bgcolor: 'white' }}>
+                  <InputLabel>Period Type</InputLabel>
+                  <Select
+                    value={periodType}
+                    onChange={(e) => setPeriodType(e.target.value)}
+                    label="Period Type"
+                  >
+                    <MenuItem value="Q">Quarterly (Q)</MenuItem>
+                    <MenuItem value="A">Annual (A)</MenuItem>
+                    <MenuItem value="M">Monthly (M)</MenuItem>
+                    <MenuItem value="YTD">Year-to-Date (YTD)</MenuItem>
+                  </Select>
+                </FormControl>
+                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
                   Select the reporting period type
-                </p>
-              </div>
-            </div>
+                </Typography>
+              </Box>
+            </Box>
           </CardContent>
         </Card>
-        <div
+        <Box
           onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
           onDragLeave={() => setDragging(false)}
           onDrop={onDrop}
-          className={cn(
-            "group relative grid place-items-center rounded-2xl border-2 border-dashed p-10 text-center transition",
-            isDragging ? "border-black bg-neutral-100" : "border-neutral-300 hover:border-neutral-400 hover:bg-neutral-50"
-          )}
+          sx={{
+            position: 'relative',
+            display: 'grid',
+            placeItems: 'center',
+            borderRadius: 4,
+            border: '2px dashed',
+            borderColor: isDragging ? 'black' : 'grey.400',
+            bgcolor: isDragging ? 'grey.100' : 'transparent',
+            p: 5,
+            textAlign: 'center',
+            transition: 'all 0.2s',
+            '&:hover': {
+              borderColor: 'grey.600',
+              bgcolor: 'grey.50',
+            }
+          }}
         >
-          <Upload className="mb-3 h-10 w-10 opacity-70" />
-          <div className="text-lg font-medium">Drop files here</div>
-          <div className="text-sm text-neutral-500">or</div>
-          <div className="mt-3">
-            <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm shadow-sm hover:bg-neutral-50">
-              <FolderOpen className="h-4 w-4" />
-              <span>Browse files</span>
-              <Input onChange={onSelect} type="file" multiple className="hidden" />
-            </label>
-          </div>
-          <div className="mt-3 text-xs text-neutral-500">Supported: PDF, XLS/XLSX, CSV, PNG, JPG</div>
-        </div>
+          <Upload style={{ width: 40, height: 40, opacity: 0.7, marginBottom: 12 }} />
+          <Typography variant="body1" fontWeight={500}>Drop files here</Typography>
+          <Typography variant="body2" color="text.secondary">or</Typography>
+          <Box sx={{ mt: 1.5 }}>
+            <Button
+              component="label"
+              variant="outlined"
+              size="small"
+              startIcon={<FolderOpen style={{ width: 16, height: 16 }} />}
+            >
+              Browse files
+              <input
+                type="file"
+                multiple
+                onChange={onSelect}
+                style={{ display: 'none' }}
+              />
+            </Button>
+          </Box>
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 1.5 }}>
+            Supported: PDF, XLS/XLSX, CSV, PNG, JPG
+          </Typography>
+        </Box>
 
         {/* Financial Statement Type Selector */}
-        <div className="space-y-4">
-          <div className="text-sm font-medium">Financial Statement Type</div>
+        <Box>
+          <Typography variant="body2" fontWeight={500} gutterBottom>Financial Statement Type</Typography>
           
           {/* Quarterly Statements */}
-          <div>
-            <div className="text-sm font-medium text-neutral-700 mb-3">Quarterly</div>
-            <div className="flex gap-3">
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="body2" fontWeight={500} color="text.secondary" sx={{ mb: 1.5 }}>Quarterly</Typography>
+            <Box sx={{ display: 'flex', gap: 1.5 }}>
               {[
                 { value: 'Q1', label: 'Quarter-1' },
                 { value: 'Q2', label: 'Quarter-2' },
                 { value: 'Q3', label: 'Quarter-3' },
                 { value: 'Q4', label: 'Quarter-4' }
               ].map((quarter) => (
-                <button
+                <Button
                   key={quarter.value}
-                  type="button"
                   onClick={() => setSelectedStatementType(quarter.value as FinancialStatementType)}
-                  className={cn(
-                    "flex-1 rounded-lg border px-4 py-3 text-sm font-medium transition-all duration-200",
-                    selectedStatementType === quarter.value
-                      ? "bg-black text-white border-black shadow-sm"
-                      : "border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50"
-                  )}
+                  variant={selectedStatementType === quarter.value ? "contained" : "outlined"}
+                  sx={{
+                    flex: 1,
+                    bgcolor: selectedStatementType === quarter.value ? 'black' : 'white',
+                    color: selectedStatementType === quarter.value ? 'white' : 'text.primary',
+                    '&:hover': {
+                      bgcolor: selectedStatementType === quarter.value ? 'black' : 'grey.50',
+                    }
+                  }}
                 >
                   {quarter.label}
-                </button>
+                </Button>
               ))}
-            </div>
-          </div>
+            </Box>
+          </Box>
 
           {/* Half Yearly Statements */}
-          <div>
-            <div className="text-sm font-medium text-neutral-700 mb-3">Half Yearly</div>
-            <div className="flex gap-3">
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="body2" fontWeight={500} color="text.secondary" sx={{ mb: 1.5 }}>Half Yearly</Typography>
+            <Box sx={{ display: 'flex', gap: 1.5 }}>
               {[
                 { value: 'H1', label: 'Half Yearly-1' },
                 { value: 'H2', label: 'Half Yearly-2' }
               ].map((half) => (
-                <button
+                <Button
                   key={half.value}
-                  type="button"
                   onClick={() => setSelectedStatementType(half.value as FinancialStatementType)}
-                  className={cn(
-                    "flex-1 rounded-lg border px-4 py-3 text-sm font-medium transition-all duration-200",
-                    selectedStatementType === half.value
-                      ? "bg-black text-white border-black shadow-sm"
-                      : "border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50"
-                  )}
+                  variant={selectedStatementType === half.value ? "contained" : "outlined"}
+                  sx={{
+                    flex: 1,
+                    bgcolor: selectedStatementType === half.value ? 'black' : 'white',
+                    color: selectedStatementType === half.value ? 'white' : 'text.primary',
+                    '&:hover': {
+                      bgcolor: selectedStatementType === half.value ? 'black' : 'grey.50',
+                    }
+                  }}
                 >
                   {half.label}
-                </button>
+                </Button>
               ))}
-            </div>
-          </div>
+            </Box>
+          </Box>
 
           {/* Annual Statement */}
-          <div className="space-y-3">
-            <div className="text-sm font-medium text-neutral-700">Yearly</div>
-            <div className="grid grid-cols-1 gap-3">
-              <button
-                type="button"
-                onClick={() => setSelectedStatementType('Annual')}
-                className={cn(
-                  "rounded-lg border px-4 py-3 text-sm font-medium transition-all duration-200",
-                  selectedStatementType === 'Annual'
-                    ? "bg-black text-white border-black shadow-sm"
-                    : "border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50"
-                )}
-              >
-                Annual
-              </button>
-            </div>
-          </div>
-        </div>
+          <Box>
+            <Typography variant="body2" fontWeight={500} color="text.secondary" sx={{ mb: 1.5 }}>Yearly</Typography>
+            <Button
+              onClick={() => setSelectedStatementType('Annual')}
+              variant={selectedStatementType === 'Annual' ? "contained" : "outlined"}
+              fullWidth
+              sx={{
+                bgcolor: selectedStatementType === 'Annual' ? 'black' : 'white',
+                color: selectedStatementType === 'Annual' ? 'white' : 'text.primary',
+                '&:hover': {
+                  bgcolor: selectedStatementType === 'Annual' ? 'black' : 'grey.50',
+                }
+              }}
+            >
+              Annual
+            </Button>
+          </Box>
+        </Box>
 
         {/* File List */}
-        <div>
-          <div className="mb-3 flex items-center justify-between">
-            <div className="text-sm font-medium">Uploaded Files ({files.length})</div>
+        <Box>
+          <Box sx={{ mb: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Typography variant="body2" fontWeight={500}>Uploaded Files ({files.length})</Typography>
             {!uploadDate && files.some(f => f.status === "pending") && (
-              <Badge variant="outline" className="gap-1 text-amber-600 border-amber-600">
-                <AlertCircle className="h-3 w-3" />
-                Set period date to upload
-              </Badge>
+              <Chip
+                icon={<AlertCircle style={{ width: 12, height: 12 }} />}
+                label="Set period date to upload"
+                size="small"
+                color="warning"
+                variant="outlined"
+              />
             )}
-          </div>
-          <ScrollArea className="h-[320px] rounded-xl border">
-            <div className="divide-y">
-              {files.map((f, idx) => (
-                <div key={idx} className="flex items-center justify-between gap-3 px-4 py-3">
-                  <div className="flex min-w-0 flex-1 items-center gap-3">
-                    <FileText className="h-5 w-5 text-neutral-500" />
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm font-medium">{f.name}</div>
-                      <div className="flex items-center gap-2 text-xs text-neutral-500">
-                        <span>{(f.size / 1024 / 1024).toFixed(2)} MB</span>
-                        {f.statementType && (
-                          <>
-                            <span>•</span>
-                            <Badge variant="outline" className="text-xs">
-                              {f.statementType === 'H1' ? 'First Half' : 
-                               f.statementType === 'H2' ? 'Second Half' : 
-                               f.statementType === 'Annual' ? 'Annual' : f.statementType}
-                            </Badge>
-                          </>
-                        )}
-                        {f.date && f.period_type && (
-                          <>
-                            <span>•</span>
-                            <span>{f.date} ({f.period_type})</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                    {f.status === "parsed" && (
-                      <Badge variant="secondary" className="gap-1 bg-green-100 text-green-700">
-                        <CheckCircle2 className="h-3 w-3" />
-                        Parsed
-                      </Badge>
-                    )}
-                    {f.status === "pending" && (
-                      <Badge variant="secondary" className="gap-1">
-                        Pending
-                      </Badge>
-                    )}
-                    {uploading[idx] && (
-                      <Badge variant="secondary" className="gap-1">
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                        Uploading...
-                      </Badge>
-                    )}
-                    {uploadErrors[idx] && (
-                      <Badge variant="destructive" className="gap-1">
-                        <AlertCircle className="h-3 w-3" />
-                        Error
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {f.status === "pending" && !uploading[idx] && (
-                      <Button 
-                        variant="default" 
-                        size="sm"
-                        onClick={() => handleUploadToAPI(idx)}
-                        disabled={!uploadDate}
-                        className="gap-1"
-                      >
-                        <Send className="h-3 w-3" />
-                        Upload
-                      </Button>
-                    )}
-                    <Button variant="ghost" size="icon" disabled={uploading[idx]}>
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => onRemoveFile(idx)}
-                      disabled={uploading[idx]}
+          </Box>
+          <Box sx={{ height: 320, borderRadius: 3, border: 1, borderColor: 'divider', overflow: 'auto' }}>
+            {files.map((f, idx) => (
+              <Box
+                key={idx}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 2,
+                  px: 2,
+                  py: 1.5,
+                  borderBottom: idx < files.length - 1 ? 1 : 0,
+                  borderColor: 'divider',
+                }}
+              >
+                <Box sx={{ display: 'flex', minWidth: 0, flex: 1, alignItems: 'center', gap: 2 }}>
+                  <FileText style={{ width: 20, height: 20, color: '#999', flexShrink: 0 }} />
+                  <Box sx={{ minWidth: 0, flex: 1 }}>
+                    <Typography variant="body2" fontWeight={500} noWrap>{f.name}</Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                      <Typography variant="caption" color="text.secondary">
+                        {(f.size / 1024 / 1024).toFixed(2)} MB
+                      </Typography>
+                      {f.statementType && (
+                        <>
+                          <Typography variant="caption" color="text.secondary">•</Typography>
+                          <Chip
+                            label={
+                              f.statementType === 'H1' ? 'First Half' :
+                              f.statementType === 'H2' ? 'Second Half' :
+                              f.statementType === 'Annual' ? 'Annual' : f.statementType
+                            }
+                            size="small"
+                            variant="outlined"
+                            sx={{ height: 18, fontSize: '0.7rem' }}
+                          />
+                        </>
+                      )}
+                      {f.date && f.period_type && (
+                        <>
+                          <Typography variant="caption" color="text.secondary">•</Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {f.date} ({f.period_type})
+                          </Typography>
+                        </>
+                      )}
+                    </Box>
+                  </Box>
+                  {f.status === "parsed" && (
+                    <Chip
+                      icon={<CheckCircle2 style={{ width: 12, height: 12 }} />}
+                      label="Parsed"
+                      size="small"
+                      sx={{ bgcolor: '#d1fae5', color: '#065f46' }}
+                    />
+                  )}
+                  {f.status === "pending" && (
+                    <Chip label="Pending" size="small" />
+                  )}
+                  {uploading[idx] && (
+                    <Chip
+                      icon={<Loader2 style={{ width: 12, height: 12 }} />}
+                      label="Uploading..."
+                      size="small"
+                    />
+                  )}
+                  {uploadErrors[idx] && (
+                    <Chip
+                      icon={<AlertCircle style={{ width: 12, height: 12 }} />}
+                      label="Error"
+                      size="small"
+                      color="error"
+                    />
+                  )}
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  {f.status === "pending" && !uploading[idx] && (
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={() => handleUploadToAPI(idx)}
+                      disabled={!uploadDate}
+                      startIcon={<Send style={{ width: 12, height: 12 }} />}
                     >
-                      <Trash className="h-4 w-4" />
+                      Upload
                     </Button>
-                  </div>
-                </div>
-              ))}
-              {uploadErrors && Object.entries(uploadErrors).map(([idx, error]) => error && (
-                <div key={`error-${idx}`} className="bg-red-50 px-4 py-2 text-xs text-red-600">
-                  File {parseInt(idx) + 1}: {error}
-                </div>
-              ))}
-            </div>
-          </ScrollArea>
-        </div>
+                  )}
+                  <Button variant="text" size="small" sx={{ minWidth: 'auto', p: 1 }}>
+                    <Eye style={{ width: 16, height: 16 }} />
+                  </Button>
+                  <Button
+                    variant="text"
+                    size="small"
+                    onClick={() => onRemoveFile(idx)}
+                    disabled={uploading[idx]}
+                    sx={{ minWidth: 'auto', p: 1 }}
+                  >
+                    <Trash style={{ width: 16, height: 16 }} />
+                  </Button>
+                </Box>
+              </Box>
+            ))}
+            {uploadErrors && Object.entries(uploadErrors).map(([idx, error]) => error && (
+              <Box
+                key={`error-${idx}`}
+                sx={{ bgcolor: '#fef2f2', px: 2, py: 1, fontSize: '0.75rem', color: '#dc2626' }}
+              >
+                File {parseInt(idx) + 1}: {error}
+              </Box>
+            ))}
+          </Box>
+        </Box>
       </CardContent>
     </Card>
   );
