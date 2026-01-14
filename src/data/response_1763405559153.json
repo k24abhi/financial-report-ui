@@ -1,0 +1,2157 @@
+[
+  {
+    "rowCount": 38,
+    "columnCount": 2,
+    "cells": [
+      {
+        "rowIndex": 0,
+        "columnIndex": 0,
+        "content": "Current Assets",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1184,
+              1.27,
+              4.8286,
+              1.2621,
+              4.8286,
+              1.4524,
+              2.1184,
+              1.4604
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 150,
+            "length": 14
+          }
+        ],
+        "elements": [
+          "/paragraphs/4"
+        ]
+      },
+      {
+        "rowIndex": 0,
+        "columnIndex": 1,
+        "content": "",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8286,
+              1.2621,
+              6.374,
+              1.2621,
+              6.374,
+              1.4524,
+              4.8286,
+              1.4524
+            ]
+          }
+        ],
+        "spans": []
+      },
+      {
+        "rowIndex": 1,
+        "columnIndex": 0,
+        "content": "Petty Cash",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1184,
+              1.4604,
+              4.8286,
+              1.4524,
+              4.8286,
+              1.619,
+              2.1184,
+              1.619
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 165,
+            "length": 10
+          }
+        ],
+        "elements": [
+          "/paragraphs/5"
+        ]
+      },
+      {
+        "rowIndex": 1,
+        "columnIndex": 1,
+        "content": "$ 500.00",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8286,
+              1.4524,
+              6.374,
+              1.4524,
+              6.374,
+              1.619,
+              4.8286,
+              1.619
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 176,
+            "length": 8
+          }
+        ],
+        "elements": [
+          "/paragraphs/6"
+        ]
+      },
+      {
+        "rowIndex": 2,
+        "columnIndex": 0,
+        "content": "Checking: General",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1184,
+              1.619,
+              4.8286,
+              1.619,
+              4.8286,
+              1.7697,
+              2.1184,
+              1.7776
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 185,
+            "length": 17
+          }
+        ],
+        "elements": [
+          "/paragraphs/7"
+        ]
+      },
+      {
+        "rowIndex": 2,
+        "columnIndex": 1,
+        "content": "78,582.65",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8286,
+              1.619,
+              6.374,
+              1.619,
+              6.374,
+              1.7697,
+              4.8286,
+              1.7697
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 203,
+            "length": 9
+          }
+        ],
+        "elements": [
+          "/paragraphs/8"
+        ]
+      },
+      {
+        "rowIndex": 3,
+        "columnIndex": 0,
+        "content": "Cash on Hand",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1184,
+              1.7776,
+              4.8286,
+              1.7697,
+              4.8286,
+              1.9759,
+              2.1184,
+              1.9759
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 213,
+            "length": 12
+          }
+        ],
+        "elements": [
+          "/paragraphs/9"
+        ]
+      },
+      {
+        "rowIndex": 3,
+        "columnIndex": 1,
+        "content": "56,739.00",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8286,
+              1.7697,
+              6.374,
+              1.7697,
+              6.374,
+              1.9759,
+              4.8286,
+              1.9759
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 226,
+            "length": 9
+          }
+        ],
+        "elements": [
+          "/paragraphs/10"
+        ]
+      },
+      {
+        "rowIndex": 4,
+        "columnIndex": 0,
+        "content": "Total Current Assets",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1184,
+              1.9759,
+              4.8286,
+              1.9759,
+              4.8286,
+              2.2376,
+              2.1184,
+              2.2455
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 236,
+            "length": 20
+          }
+        ],
+        "elements": [
+          "/paragraphs/11"
+        ]
+      },
+      {
+        "rowIndex": 4,
+        "columnIndex": 1,
+        "content": "135,821.65",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8286,
+              1.9759,
+              6.374,
+              1.9759,
+              6.374,
+              2.2297,
+              4.8286,
+              2.2376
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 257,
+            "length": 10
+          }
+        ],
+        "elements": [
+          "/paragraphs/12"
+        ]
+      },
+      {
+        "rowIndex": 5,
+        "columnIndex": 0,
+        "content": "Property and Equipment",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1184,
+              2.2455,
+              4.8286,
+              2.2376,
+              4.8286,
+              2.4597,
+              2.1184,
+              2.4676
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 268,
+            "length": 22
+          }
+        ],
+        "elements": [
+          "/paragraphs/13"
+        ]
+      },
+      {
+        "rowIndex": 5,
+        "columnIndex": 1,
+        "content": "",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8286,
+              2.2376,
+              6.374,
+              2.2297,
+              6.374,
+              2.4438,
+              4.8286,
+              2.4597
+            ]
+          }
+        ],
+        "spans": []
+      },
+      {
+        "rowIndex": 6,
+        "columnIndex": 0,
+        "content": "Furniture & Fixtures",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1184,
+              2.4676,
+              4.8286,
+              2.4597,
+              4.8366,
+              2.6183,
+              2.1184,
+              2.6262
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 291,
+            "length": 20
+          }
+        ],
+        "elements": [
+          "/paragraphs/14"
+        ]
+      },
+      {
+        "rowIndex": 6,
+        "columnIndex": 1,
+        "content": "90,822.54",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8286,
+              2.4597,
+              6.374,
+              2.4438,
+              6.374,
+              2.6103,
+              4.8366,
+              2.6183
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 312,
+            "length": 9
+          }
+        ],
+        "elements": [
+          "/paragraphs/15"
+        ]
+      },
+      {
+        "rowIndex": 7,
+        "columnIndex": 0,
+        "content": "Equipment",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1184,
+              2.6262,
+              4.8366,
+              2.6183,
+              4.8366,
+              2.761,
+              2.1263,
+              2.7769
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 322,
+            "length": 9
+          }
+        ],
+        "elements": [
+          "/paragraphs/16"
+        ]
+      },
+      {
+        "rowIndex": 7,
+        "columnIndex": 1,
+        "content": "15,966.50",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              2.6183,
+              6.374,
+              2.6103,
+              6.374,
+              2.761,
+              4.8366,
+              2.761
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 332,
+            "length": 9
+          }
+        ],
+        "elements": [
+          "/paragraphs/17"
+        ]
+      },
+      {
+        "rowIndex": 8,
+        "columnIndex": 0,
+        "content": "Buildings",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              2.7769,
+              4.8366,
+              2.761,
+              4.8366,
+              2.9276,
+              2.1263,
+              2.9355
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 342,
+            "length": 9
+          }
+        ],
+        "elements": [
+          "/paragraphs/18"
+        ]
+      },
+      {
+        "rowIndex": 8,
+        "columnIndex": 1,
+        "content": "843,970.00",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              2.761,
+              6.374,
+              2.761,
+              6.374,
+              2.9197,
+              4.8366,
+              2.9276
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 352,
+            "length": 10
+          }
+        ],
+        "elements": [
+          "/paragraphs/19"
+        ]
+      },
+      {
+        "rowIndex": 9,
+        "columnIndex": 0,
+        "content": "Land",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              2.9355,
+              4.8366,
+              2.9276,
+              4.8366,
+              3.0783,
+              2.1263,
+              3.0862
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 363,
+            "length": 4
+          }
+        ],
+        "elements": [
+          "/paragraphs/20"
+        ]
+      },
+      {
+        "rowIndex": 9,
+        "columnIndex": 1,
+        "content": "345,530.00",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              2.9276,
+              6.374,
+              2.9197,
+              6.374,
+              3.0783,
+              4.8366,
+              3.0783
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 368,
+            "length": 10
+          }
+        ],
+        "elements": [
+          "/paragraphs/21"
+        ]
+      },
+      {
+        "rowIndex": 10,
+        "columnIndex": 0,
+        "content": "Accumulated Depreciation",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              3.0862,
+              4.8366,
+              3.0783,
+              4.8366,
+              3.2369,
+              2.1263,
+              3.2448
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 379,
+            "length": 24
+          }
+        ],
+        "elements": [
+          "/paragraphs/22"
+        ]
+      },
+      {
+        "rowIndex": 10,
+        "columnIndex": 1,
+        "content": "(162,472.79)",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              3.0783,
+              6.374,
+              3.0783,
+              6.374,
+              3.2369,
+              4.8366,
+              3.2369
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 404,
+            "length": 12
+          }
+        ],
+        "elements": [
+          "/paragraphs/23"
+        ]
+      },
+      {
+        "rowIndex": 11,
+        "columnIndex": 0,
+        "content": "Automobiles",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              3.2448,
+              4.8366,
+              3.2369,
+              4.8366,
+              3.451,
+              2.1263,
+              3.459
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 417,
+            "length": 11
+          }
+        ],
+        "elements": [
+          "/paragraphs/24"
+        ]
+      },
+      {
+        "rowIndex": 11,
+        "columnIndex": 1,
+        "content": "13,000.00",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              3.2369,
+              6.374,
+              3.2369,
+              6.374,
+              3.451,
+              4.8366,
+              3.451
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 429,
+            "length": 9
+          }
+        ],
+        "elements": [
+          "/paragraphs/25"
+        ]
+      },
+      {
+        "rowIndex": 12,
+        "columnIndex": 0,
+        "content": "Net Property and Equipment",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              3.459,
+              4.8366,
+              3.451,
+              4.8366,
+              3.7207,
+              2.1263,
+              3.7286
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 439,
+            "length": 26
+          }
+        ],
+        "elements": [
+          "/paragraphs/26"
+        ]
+      },
+      {
+        "rowIndex": 12,
+        "columnIndex": 1,
+        "content": "1,146,816.25",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              3.451,
+              6.374,
+              3.451,
+              6.374,
+              3.7207,
+              4.8366,
+              3.7207
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 466,
+            "length": 12
+          }
+        ],
+        "elements": [
+          "/paragraphs/27"
+        ]
+      },
+      {
+        "rowIndex": 13,
+        "columnIndex": 0,
+        "content": "Non Current Assets",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              3.7286,
+              4.8366,
+              3.7207,
+              4.8366,
+              3.9269,
+              2.1263,
+              3.9427
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 479,
+            "length": 18
+          }
+        ],
+        "elements": [
+          "/paragraphs/28"
+        ]
+      },
+      {
+        "rowIndex": 13,
+        "columnIndex": 1,
+        "content": "",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              3.7207,
+              6.374,
+              3.7207,
+              6.374,
+              3.9269,
+              4.8366,
+              3.9269
+            ]
+          }
+        ],
+        "spans": []
+      },
+      {
+        "rowIndex": 14,
+        "columnIndex": 0,
+        "content": "Goodwill",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              3.9427,
+              4.8366,
+              3.9269,
+              4.8366,
+              4.0855,
+              2.1263,
+              4.0934
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 498,
+            "length": 8
+          }
+        ],
+        "elements": [
+          "/paragraphs/29"
+        ]
+      },
+      {
+        "rowIndex": 14,
+        "columnIndex": 1,
+        "content": "217,500.00",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              3.9269,
+              6.374,
+              3.9269,
+              6.374,
+              4.0855,
+              4.8366,
+              4.0855
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 507,
+            "length": 10
+          }
+        ],
+        "elements": [
+          "/paragraphs/30"
+        ]
+      },
+      {
+        "rowIndex": 15,
+        "columnIndex": 0,
+        "content": "Accumulated Amortization",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              4.0934,
+              4.8366,
+              4.0855,
+              4.8366,
+              4.2996,
+              2.1263,
+              4.3076
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 518,
+            "length": 24
+          }
+        ],
+        "elements": [
+          "/paragraphs/31"
+        ]
+      },
+      {
+        "rowIndex": 15,
+        "columnIndex": 1,
+        "content": "(24,166.67)",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              4.0855,
+              6.374,
+              4.0855,
+              6.374,
+              4.2917,
+              4.8366,
+              4.2996
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 543,
+            "length": 11
+          }
+        ],
+        "elements": [
+          "/paragraphs/32"
+        ]
+      },
+      {
+        "rowIndex": 16,
+        "columnIndex": 0,
+        "content": "Total Non Current Assets",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              4.3076,
+              4.8366,
+              4.2996,
+              4.8366,
+              4.5614,
+              2.1263,
+              4.5693
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 555,
+            "length": 24
+          }
+        ],
+        "elements": [
+          "/paragraphs/33"
+        ]
+      },
+      {
+        "rowIndex": 16,
+        "columnIndex": 1,
+        "content": "193,333.33",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              4.2996,
+              6.374,
+              4.2917,
+              6.374,
+              4.5534,
+              4.8366,
+              4.5614
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 580,
+            "length": 10
+          }
+        ],
+        "elements": [
+          "/paragraphs/34"
+        ]
+      },
+      {
+        "rowIndex": 17,
+        "columnIndex": 0,
+        "content": "Total Assets",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              4.5693,
+              4.8366,
+              4.5614,
+              4.8366,
+              4.8389,
+              2.1263,
+              4.8469
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 591,
+            "length": 12
+          }
+        ],
+        "elements": [
+          "/paragraphs/35"
+        ]
+      },
+      {
+        "rowIndex": 17,
+        "columnIndex": 1,
+        "content": "$ 1,475,971.23",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              4.5614,
+              6.374,
+              4.5534,
+              6.374,
+              4.831,
+              4.8366,
+              4.8389
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 604,
+            "length": 14
+          }
+        ],
+        "elements": [
+          "/paragraphs/36"
+        ]
+      },
+      {
+        "rowIndex": 18,
+        "columnIndex": 0,
+        "columnSpan": 2,
+        "content": "Liabilities and Partners' Equity",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              4.8469,
+              6.374,
+              4.831,
+              6.374,
+              5.1403,
+              2.1263,
+              5.1641
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 619,
+            "length": 32
+          }
+        ],
+        "elements": [
+          "/paragraphs/37"
+        ]
+      },
+      {
+        "rowIndex": 19,
+        "columnIndex": 0,
+        "content": "Current Liabilities",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              5.1641,
+              4.8366,
+              5.1562,
+              4.8366,
+              5.3545,
+              2.1263,
+              5.3624
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 652,
+            "length": 19
+          }
+        ],
+        "elements": [
+          "/paragraphs/38"
+        ]
+      },
+      {
+        "rowIndex": 19,
+        "columnIndex": 1,
+        "content": "",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              5.1562,
+              6.374,
+              5.1403,
+              6.374,
+              5.3545,
+              4.8366,
+              5.3545
+            ]
+          }
+        ],
+        "spans": []
+      },
+      {
+        "rowIndex": 20,
+        "columnIndex": 0,
+        "content": "Credit Card Payable - 2349",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              5.3624,
+              4.8366,
+              5.3545,
+              4.8366,
+              5.5131,
+              2.1263,
+              5.521
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 672,
+            "length": 26
+          }
+        ],
+        "elements": [
+          "/paragraphs/39"
+        ]
+      },
+      {
+        "rowIndex": 20,
+        "columnIndex": 1,
+        "content": "$ 95.34",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              5.3545,
+              6.374,
+              5.3545,
+              6.374,
+              5.5051,
+              4.8366,
+              5.5131
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 699,
+            "length": 7
+          }
+        ],
+        "elements": [
+          "/paragraphs/40"
+        ]
+      },
+      {
+        "rowIndex": 21,
+        "columnIndex": 0,
+        "content": "FICA Payable",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              5.521,
+              4.8366,
+              5.5131,
+              4.8366,
+              5.6717,
+              2.1263,
+              5.6796
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 707,
+            "length": 12
+          }
+        ],
+        "elements": [
+          "/paragraphs/41"
+        ]
+      },
+      {
+        "rowIndex": 21,
+        "columnIndex": 1,
+        "content": "682.12",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              5.5131,
+              6.374,
+              5.5051,
+              6.3819,
+              5.6717,
+              4.8366,
+              5.6717
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 720,
+            "length": 6
+          }
+        ],
+        "elements": [
+          "/paragraphs/42"
+        ]
+      },
+      {
+        "rowIndex": 22,
+        "columnIndex": 0,
+        "content": "School District W/H Payable",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              5.6796,
+              4.8366,
+              5.6717,
+              4.8366,
+              5.8303,
+              2.1263,
+              5.8382
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 727,
+            "length": 27
+          }
+        ],
+        "elements": [
+          "/paragraphs/43"
+        ]
+      },
+      {
+        "rowIndex": 22,
+        "columnIndex": 1,
+        "content": "46.88",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              5.6717,
+              6.3819,
+              5.6717,
+              6.3819,
+              5.8303,
+              4.8366,
+              5.8303
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 755,
+            "length": 5
+          }
+        ],
+        "elements": [
+          "/paragraphs/44"
+        ]
+      },
+      {
+        "rowIndex": 23,
+        "columnIndex": 0,
+        "content": "State W/H Payable",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              5.8382,
+              4.8366,
+              5.8303,
+              4.8366,
+              5.9889,
+              2.1263,
+              5.9969
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 761,
+            "length": 17
+          }
+        ],
+        "elements": [
+          "/paragraphs/45"
+        ]
+      },
+      {
+        "rowIndex": 23,
+        "columnIndex": 1,
+        "content": "68.66",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              5.8303,
+              6.3819,
+              5.8303,
+              6.3819,
+              5.9731,
+              4.8366,
+              5.9889
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 779,
+            "length": 5
+          }
+        ],
+        "elements": [
+          "/paragraphs/46"
+        ]
+      },
+      {
+        "rowIndex": 24,
+        "columnIndex": 0,
+        "content": "Local W/H Payable",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              5.9969,
+              4.8366,
+              5.9889,
+              4.8366,
+              6.1475,
+              2.1263,
+              6.1475
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 785,
+            "length": 17
+          }
+        ],
+        "elements": [
+          "/paragraphs/47"
+        ]
+      },
+      {
+        "rowIndex": 24,
+        "columnIndex": 1,
+        "content": "210.95",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              5.9889,
+              6.3819,
+              5.9731,
+              6.3819,
+              6.1317,
+              4.8366,
+              6.1475
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 803,
+            "length": 6
+          }
+        ],
+        "elements": [
+          "/paragraphs/48"
+        ]
+      },
+      {
+        "rowIndex": 25,
+        "columnIndex": 0,
+        "content": "Sales Tax Payable",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              6.1475,
+              4.8366,
+              6.1475,
+              4.8366,
+              6.2982,
+              2.1263,
+              6.3062
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 810,
+            "length": 17
+          }
+        ],
+        "elements": [
+          "/paragraphs/49"
+        ]
+      },
+      {
+        "rowIndex": 25,
+        "columnIndex": 1,
+        "content": "4,824.78",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              6.1475,
+              6.3819,
+              6.1317,
+              6.3819,
+              6.2982,
+              4.8366,
+              6.2982
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 828,
+            "length": 8
+          }
+        ],
+        "elements": [
+          "/paragraphs/50"
+        ]
+      },
+      {
+        "rowIndex": 26,
+        "columnIndex": 0,
+        "content": "Accomodation Tax Payable",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              6.3062,
+              4.8366,
+              6.2982,
+              4.8366,
+              6.5044,
+              2.1263,
+              6.5124
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 837,
+            "length": 24
+          }
+        ],
+        "elements": [
+          "/paragraphs/51"
+        ]
+      },
+      {
+        "rowIndex": 26,
+        "columnIndex": 1,
+        "content": "8,853.56",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              6.2982,
+              6.3819,
+              6.2982,
+              6.3819,
+              6.5044,
+              4.8366,
+              6.5044
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 862,
+            "length": 8
+          }
+        ],
+        "elements": [
+          "/paragraphs/52"
+        ]
+      },
+      {
+        "rowIndex": 27,
+        "columnIndex": 0,
+        "content": "Total Current Liabilities",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              6.5124,
+              4.8366,
+              6.5044,
+              4.8366,
+              6.7662,
+              2.1263,
+              6.7741
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 871,
+            "length": 25
+          }
+        ],
+        "elements": [
+          "/paragraphs/53"
+        ]
+      },
+      {
+        "rowIndex": 27,
+        "columnIndex": 1,
+        "content": "14,782.29",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              6.5044,
+              6.3819,
+              6.5044,
+              6.3819,
+              6.7662,
+              4.8366,
+              6.7662
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 897,
+            "length": 9
+          }
+        ],
+        "elements": [
+          "/paragraphs/54"
+        ]
+      },
+      {
+        "rowIndex": 28,
+        "columnIndex": 0,
+        "content": "Long-Term Liabilities",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              6.7741,
+              4.8366,
+              6.7662,
+              4.8366,
+              6.9882,
+              2.1263,
+              6.9962
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 907,
+            "length": 21
+          }
+        ],
+        "elements": [
+          "/paragraphs/55"
+        ]
+      },
+      {
+        "rowIndex": 28,
+        "columnIndex": 1,
+        "content": "",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              6.7662,
+              6.3819,
+              6.7662,
+              6.3819,
+              6.9803,
+              4.8366,
+              6.9882
+            ]
+          }
+        ],
+        "spans": []
+      },
+      {
+        "rowIndex": 29,
+        "columnIndex": 0,
+        "content": "Land Contract Payable",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              6.9962,
+              4.8366,
+              6.9882,
+              4.8366,
+              7.1944,
+              2.1263,
+              7.2103
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 929,
+            "length": 21
+          }
+        ],
+        "elements": [
+          "/paragraphs/56"
+        ]
+      },
+      {
+        "rowIndex": 29,
+        "columnIndex": 1,
+        "content": "1,219,463.90",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              6.9882,
+              6.3819,
+              6.9803,
+              6.3819,
+              7.1944,
+              4.8366,
+              7.1944
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 951,
+            "length": 12
+          }
+        ],
+        "elements": [
+          "/paragraphs/57"
+        ]
+      },
+      {
+        "rowIndex": 30,
+        "columnIndex": 0,
+        "content": "Total Long-Term Liabilities",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              7.2103,
+              4.8366,
+              7.1944,
+              4.8366,
+              7.4562,
+              2.1263,
+              7.4641
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 964,
+            "length": 27
+          }
+        ],
+        "elements": [
+          "/paragraphs/58"
+        ]
+      },
+      {
+        "rowIndex": 30,
+        "columnIndex": 1,
+        "content": "1,219,463.90",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              7.1944,
+              6.3819,
+              7.1944,
+              6.3819,
+              7.4562,
+              4.8366,
+              7.4562
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 992,
+            "length": 12
+          }
+        ],
+        "elements": [
+          "/paragraphs/59"
+        ]
+      },
+      {
+        "rowIndex": 31,
+        "columnIndex": 0,
+        "content": "Total Liabilities",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              7.4641,
+              4.8366,
+              7.4562,
+              4.8366,
+              7.7337,
+              2.1263,
+              7.7417
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 1005,
+            "length": 17
+          }
+        ],
+        "elements": [
+          "/paragraphs/60"
+        ]
+      },
+      {
+        "rowIndex": 31,
+        "columnIndex": 1,
+        "content": "1,234,246.19",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              7.4562,
+              6.3819,
+              7.4562,
+              6.3819,
+              7.7258,
+              4.8366,
+              7.7337
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 1023,
+            "length": 12
+          }
+        ],
+        "elements": [
+          "/paragraphs/61"
+        ]
+      },
+      {
+        "rowIndex": 32,
+        "columnIndex": 0,
+        "content": "Partners' Equity",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              7.7417,
+              4.8366,
+              7.7337,
+              4.8366,
+              7.9479,
+              2.1263,
+              7.9558
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 1036,
+            "length": 16
+          }
+        ],
+        "elements": [
+          "/paragraphs/62"
+        ]
+      },
+      {
+        "rowIndex": 32,
+        "columnIndex": 1,
+        "content": "",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              7.7337,
+              6.3819,
+              7.7258,
+              6.3819,
+              7.9479,
+              4.8366,
+              7.9479
+            ]
+          }
+        ],
+        "spans": []
+      },
+      {
+        "rowIndex": 33,
+        "columnIndex": 0,
+        "content": "Distributions",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              7.9558,
+              4.8366,
+              7.9479,
+              4.8366,
+              8.1065,
+              2.1263,
+              8.1065
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 1053,
+            "length": 13
+          }
+        ],
+        "elements": [
+          "/paragraphs/63"
+        ]
+      },
+      {
+        "rowIndex": 33,
+        "columnIndex": 1,
+        "content": "(324,016.66)",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              7.9479,
+              6.3819,
+              7.9479,
+              6.3819,
+              8.1065,
+              4.8366,
+              8.1065
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 1067,
+            "length": 12
+          }
+        ],
+        "elements": [
+          "/paragraphs/64"
+        ]
+      },
+      {
+        "rowIndex": 34,
+        "columnIndex": 0,
+        "content": "Net Income",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              8.1065,
+              4.8366,
+              8.1065,
+              4.8366,
+              8.2572,
+              2.1263,
+              8.2572
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 1080,
+            "length": 10
+          }
+        ],
+        "elements": [
+          "/paragraphs/65"
+        ]
+      },
+      {
+        "rowIndex": 34,
+        "columnIndex": 1,
+        "content": "255,439.87",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              8.1065,
+              6.3819,
+              8.1065,
+              6.3819,
+              8.2492,
+              4.8366,
+              8.2572
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 1091,
+            "length": 10
+          }
+        ],
+        "elements": [
+          "/paragraphs/66"
+        ]
+      },
+      {
+        "rowIndex": 35,
+        "columnIndex": 0,
+        "content": "Retained Earnings",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              8.2572,
+              4.8366,
+              8.2572,
+              4.8445,
+              8.4555,
+              2.1263,
+              8.4475
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 1102,
+            "length": 17
+          }
+        ],
+        "elements": [
+          "/paragraphs/67"
+        ]
+      },
+      {
+        "rowIndex": 35,
+        "columnIndex": 1,
+        "content": "310,301.83",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8366,
+              8.2572,
+              6.3819,
+              8.2492,
+              6.3819,
+              8.4555,
+              4.8445,
+              8.4555
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 1120,
+            "length": 10
+          }
+        ],
+        "elements": [
+          "/paragraphs/68"
+        ]
+      },
+      {
+        "rowIndex": 36,
+        "columnIndex": 0,
+        "content": "Total Partners' Equity",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              8.4475,
+              4.8445,
+              8.4555,
+              4.8445,
+              8.741,
+              2.1263,
+              8.7489
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 1131,
+            "length": 22
+          }
+        ],
+        "elements": [
+          "/paragraphs/69"
+        ]
+      },
+      {
+        "rowIndex": 36,
+        "columnIndex": 1,
+        "content": "241,725.04",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8445,
+              8.4555,
+              6.3819,
+              8.4555,
+              6.3819,
+              8.741,
+              4.8445,
+              8.741
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 1154,
+            "length": 10
+          }
+        ],
+        "elements": [
+          "/paragraphs/70"
+        ]
+      },
+      {
+        "rowIndex": 37,
+        "columnIndex": 0,
+        "content": "Total Liabilities and Partners' Equity",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              2.1263,
+              8.7489,
+              4.8445,
+              8.741,
+              4.8445,
+              9.0265,
+              2.1263,
+              9.0185
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 1165,
+            "length": 38
+          }
+        ],
+        "elements": [
+          "/paragraphs/71"
+        ]
+      },
+      {
+        "rowIndex": 37,
+        "columnIndex": 1,
+        "content": "$ 1,475,971.23",
+        "boundingRegions": [
+          {
+            "pageNumber": 2,
+            "polygon": [
+              4.8445,
+              8.741,
+              6.3819,
+              8.741,
+              6.3819,
+              9.0265,
+              4.8445,
+              9.0265
+            ]
+          }
+        ],
+        "spans": [
+          {
+            "offset": 1204,
+            "length": 14
+          }
+        ],
+        "elements": [
+          "/paragraphs/72"
+        ]
+      }
+    ],
+    "boundingRegions": [
+      {
+        "pageNumber": 2,
+        "polygon": [
+          2.1591,
+          1.286,
+          6.351,
+          1.2819,
+          6.3532,
+          9.0121,
+          2.1606,
+          9.0181
+        ]
+      }
+    ],
+    "spans": [
+      {
+        "offset": 150,
+        "length": 1068
+      }
+    ]
+  }
+]

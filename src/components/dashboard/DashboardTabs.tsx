@@ -1,10 +1,11 @@
-import { FileText, TrendingUp, Grid3x3, Upload, Calculator } from "lucide-react";
+import { FileText, TrendingUp, Grid3x3, Upload, Calculator, FileEdit } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Deal, GridSection, UploadedFile, CellKey, FinancialStatementType } from "../../types";
 import { DealsTab } from "./tabs/DealsTab";
 import { FinancialsTab } from "./tabs/FinancialsTab";
 import { DataGridTab } from "./tabs/DataGridTab";
 import { UploadTab } from "./tabs/UploadTab";
+import { EditExtractionTab } from "./tabs/EditExtractionTab";
 import { AnalysisTab } from "./tabs/AnalysisTab";
 
 interface DashboardTabsProps {
@@ -14,6 +15,7 @@ interface DashboardTabsProps {
   selectedCells: Set<CellKey>;
   files: UploadedFile[];
   selectedSum: number;
+  companyId?: string;
   onToggleRow: (id: string) => void;
   onToggleCell: (cellKey: CellKey) => void;
   onClearSelection: () => void;
@@ -30,6 +32,7 @@ export function DashboardTabs({
   selectedCells,
   files,
   selectedSum,
+  companyId,
   onToggleRow,
   onToggleCell,
   onClearSelection,
@@ -40,7 +43,7 @@ export function DashboardTabs({
 }: DashboardTabsProps) {
   return (
     <Tabs defaultValue="deals" className="space-y-4">
-      <TabsList className="grid w-full grid-cols-5">
+      <TabsList className="inline-flex h-10 items-center justify-start rounded-md bg-muted p-1 text-muted-foreground w-full overflow-x-auto">
         <TabsTrigger value="deals" className="gap-2">
           <FileText className="h-4 w-4" />
           Deal History
@@ -56,6 +59,10 @@ export function DashboardTabs({
         <TabsTrigger value="upload" className="gap-2">
           <Upload className="h-4 w-4" />
           Documents
+        </TabsTrigger>
+        <TabsTrigger value="extraction" className="gap-2">
+          <FileEdit className="h-4 w-4" />
+          Edit Extraction
         </TabsTrigger>
         <TabsTrigger value="analysis" className="gap-2">
           <Calculator className="h-4 w-4" />
@@ -90,7 +97,12 @@ export function DashboardTabs({
           onAddFiles={onAddFiles}
           onRemoveFile={onRemoveFile}
           onUpdateFileStatementType={onUpdateFileStatementType}
+          companyId={companyId}
         />
+      </TabsContent>
+
+      <TabsContent value="extraction">
+        <EditExtractionTab companyId={companyId} files={files} />
       </TabsContent>
 
       <TabsContent value="analysis">

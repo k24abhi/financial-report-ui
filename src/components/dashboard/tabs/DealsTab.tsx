@@ -1,5 +1,5 @@
 import { Calendar, FileText, Eye, Download, TrendingUp, TrendingDown, CheckCircle2, AlertCircle } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../../ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "../../ui/card";
 import { Button } from "../../ui/button";
 import { Separator } from "../../ui/separator";
 import { StatusBadge } from "../../shared/StatusBadge";
@@ -33,12 +33,10 @@ export function DealsTab({ deals }: DealsTabProps) {
                   <CardTitle className="text-lg">{deal.id}</CardTitle>
                   <StatusBadge status={deal.status} />
                 </div>
-                <CardDescription className="mt-2">
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    {formatDate(deal.date)} • {deal.purpose}
-                  </div>
-                </CardDescription>
+                <div className="mt-2 flex items-center gap-1 text-sm text-muted-foreground">
+                  <Calendar className="h-3 w-3" />
+                  <span>{formatDate(deal.date)} • {deal.purpose}</span>
+                </div>
               </div>
               <div className="text-right">
                 <div className="text-2xl font-semibold">{formatUSD(deal.amount)}</div>

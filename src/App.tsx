@@ -215,6 +215,7 @@ export default function App() {
                 selectedCells={selectedCells}
                 files={files}
                 selectedSum={selectedSum}
+                companyId={selectedCompany.id.toString()}
                 onToggleRow={toggleRow}
                 onToggleCell={toggleCell}
                 onClearSelection={clearCellSelection}
