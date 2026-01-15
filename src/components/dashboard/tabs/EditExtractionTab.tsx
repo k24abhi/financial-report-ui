@@ -12,7 +12,7 @@ type Table = TableRow[];
 
 import type { EditExtractionTabProps } from "../../../types/interfaces";
 
-export function EditExtractionTab({ companyId = "company_1", files = [] }: EditExtractionTabProps) {
+export function EditExtractionTab({ companyId = "company_1", files = [], onTabChange, onExportData }: EditExtractionTabProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedData, setEditedData] = useState<Record<string, string>>({});
@@ -30,6 +30,15 @@ export function EditExtractionTab({ companyId = "company_1", files = [] }: EditE
   const parsedFiles = useMemo(() => {
     return files.filter(f => f.status === "parsed" && f.date && f.period_type);
   }, [files]);
+
+  const handleExport = () => {
+    // Export the current table data
+    if (loadedTables && loadedTables.length > 0) {
+      const currentTable = loadedTables[selectedTable];
+      onExportData?.(currentTable);
+      onTabChange?.(2); // Switch to Data Grid tab
+    }
+  };
 
   // Load extraction data when file is selected
   useEffect(() => {
@@ -188,6 +197,8 @@ export function EditExtractionTab({ companyId = "company_1", files = [] }: EditE
               <Button
                 variant="outlined"
                 size="small"
+                onClick={handleExport}
+                disabled={!loadedTables || loadedTables.length === 0}
                 startIcon={<Download style={{ width: 16, height: 16 }} />}
               >
                 Export
