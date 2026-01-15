@@ -2,10 +2,7 @@ import { TrendingUp, TrendingDown } from "lucide-react";
 import { Card, CardContent, Typography, Box, Grid } from "@mui/material";
 import { formatUSD } from "../../utils/formatters";
 import { Deal } from "../../types";
-
-interface KeyMetricsProps {
-  deals: Deal[];
-}
+import type { KeyMetricsProps } from "../../types/interfaces";
 
 export function KeyMetrics({ deals }: KeyMetricsProps) {
   const totalAmount = deals.reduce((sum, d) => sum + d.amount, 0);

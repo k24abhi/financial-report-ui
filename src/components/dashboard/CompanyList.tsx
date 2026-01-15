@@ -3,13 +3,7 @@ import { Search, Plus } from "lucide-react";
 import { Card, CardContent, TextField, Chip, Button, Box, Typography } from "@mui/material";
 import { Company } from "../../types";
 import { AddCompanyDialog } from "./AddCompanyDialog";
-
-interface CompanyListProps {
-  companies: Company[];
-  selectedCompanyId: number | null;
-  onSelectCompany: (id: number) => void;
-  onAddCompany: (company: Omit<Company, "id" | "deals">) => void;
-}
+import type { CompanyListProps } from "../../types/interfaces";
 
 export function CompanyList({ 
   companies, 

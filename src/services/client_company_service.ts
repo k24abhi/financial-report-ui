@@ -1,5 +1,4 @@
-const API_BASE_URL = 'https://atomic-leshia-reddy-rentals-c91628b8.koyeb.app';
-
+import { API_BASE_URL, API_ENDPOINTS } from '../config/api';
 import type { Company, NewCompanyForm } from '../types';
 
 export type CompanyId = string | number;
@@ -8,9 +7,9 @@ function toCompany(detail: any): Company {
   // Map backend details to UI Company type
   return {
     id: Number(detail?.company_id ?? detail?.id ?? Math.floor(Math.random()*100000)),
-    name: detail?.name ?? 'Unknown Company',
+    name: detail?.company_name ?? detail?.name ?? 'Unknown Company',
     type: detail?.type ?? 'Unknown',
-    location: detail?.location ?? 'Unknown',
+    location: detail?.address ?? detail?.location ?? 'Unknown',
     industry: detail?.industry ?? 'Unknown',
     borrower: detail?.borrower ?? 'Unknown',
     deals: Array.isArray(detail?.deals) ? detail.deals : [],
@@ -19,7 +18,7 @@ function toCompany(detail: any): Company {
 
 export const clientCompanyService = {
   async getClientCompanies(accessToken: string): Promise<CompanyId[]> {
-    const res = await fetch(`${API_BASE_URL}/client_company/get_client_companies`, {
+    const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.getClientCompanies}`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     console.log(accessToken, res)
@@ -29,22 +28,29 @@ export const clientCompanyService = {
   },
 
   async getCompanyDetails(accessToken: string, companyId: CompanyId): Promise<Company> {
-    const url = `${API_BASE_URL}/client_company/get_company_details?company_id=${companyId}`;
+    const url = `${API_BASE_URL}${API_ENDPOINTS.getCompanyDetails}?company_id=${companyId}`;
     const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
     if (!res.ok) throw new Error('Failed to fetch company details');
     const data = await res.json();
-    const detail = data?.company ?? data; // try both shapes
+    const detail = data?.company_details ?? data?.company ?? data;
     return toCompany(detail);
   },
 
   async addClientCompany(accessToken: string, payload: Record<string, any>): Promise<Company> {
-    const res = await fetch(`${API_BASE_URL}/client_company/add_client_company`, {
+    // Map UI fields to API expected fields
+    const apiPayload = {
+      company_name: payload.name || payload.company_name,
+      address: payload.location || payload.address,
+      industry: payload.industry
+    };
+    
+    const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.addClientCompany}`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(apiPayload),
     });
     if (!res.ok) {
       try {
@@ -66,11 +72,11 @@ export const clientCompanyService = {
 
   async removeClientCompany(accessToken: string, companyId: CompanyId): Promise<void> {
     // Try query string first
-    const url = `${API_BASE_URL}/client_company/remove_client_company?company_id=${companyId}`;
+    const url = `${API_BASE_URL}${API_ENDPOINTS.removeClientCompany}?company_id=${companyId}`;
     const res = await fetch(url, { method: 'DELETE', headers: { Authorization: `Bearer ${accessToken}` } });
     if (res.ok) return;
     // Fallback: send JSON body
-    const res2 = await fetch(`${API_BASE_URL}/client_company/remove_client_company`, {
+    const res2 = await fetch(`${API_BASE_URL}${API_ENDPOINTS.removeClientCompany}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -82,13 +88,21 @@ export const clientCompanyService = {
   },
 
   async updateCompanyDetails(accessToken: string, companyId: CompanyId, payload: Partial<NewCompanyForm>): Promise<Company> {
-    const res = await fetch(`${API_BASE_URL}/client_company/update_company_details`, {
+    // Map UI fields to API expected fields
+    const apiPayload = {
+      company_name: payload.name,
+      address: payload.location,
+      industry: payload.industry
+    };
+    
+    const url = `${API_BASE_URL}${API_ENDPOINTS.updateCompanyDetails}?company_id=${companyId}`;
+    const res = await fetch(url, {
       method: 'PUT',
       headers: {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ company_id: companyId, ...payload }),
+      body: JSON.stringify(apiPayload),
     });
     if (!res.ok) throw new Error('Failed to update company');
     const data = await res.json();

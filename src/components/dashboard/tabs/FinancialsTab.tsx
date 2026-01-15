@@ -1,10 +1,7 @@
 import { Card, CardContent, Typography, Divider, Box, Grid } from "@mui/material";
 import { formatUSD, formatDate } from "../../../utils/formatters";
 import { Deal } from "../../../types";
-
-interface FinancialsTabProps {
-  deals: Deal[];
-}
+import type { FinancialsTabProps } from "../../../types/interfaces";
 
 export function FinancialsTab({ deals }: FinancialsTabProps) {
   return (

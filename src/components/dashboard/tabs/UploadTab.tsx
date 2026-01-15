@@ -3,14 +3,7 @@ import { Upload, FolderOpen, FileText, Eye, Trash, Calendar, Send, CheckCircle2,
 import { Card, CardContent, CardHeader, TextField, Button, Chip, Box, Typography, Select, MenuItem, FormControl, InputLabel, Alert, Badge } from "@mui/material";
 import { UploadedFile, FinancialStatementType } from "../../../types";
 import { extractDataAPI } from "../../../services/api";
-
-interface UploadTabProps {
-  files: UploadedFile[];
-  onAddFiles: (files: UploadedFile[]) => void;
-  onRemoveFile: (index: number) => void;
-  onUpdateFileStatementType: (index: number, statementType: FinancialStatementType) => void;
-  companyId?: string;
-}
+import type { UploadTabProps } from "../../../types/interfaces";
 
 export function UploadTab({ files, onAddFiles, onRemoveFile, onUpdateFileStatementType, companyId = "company_1" }: UploadTabProps) {
   const [isDragging, setDragging] = useState(false);

@@ -3,10 +3,7 @@ import { Card, CardContent, Button, Divider, Box, Typography, LinearProgress, Gr
 import { StatusBadge } from "../../shared/StatusBadge";
 import { formatUSD, formatDate } from "../../../utils/formatters";
 import { Deal } from "../../../types";
-
-interface DealsTabProps {
-  deals: Deal[];
-}
+import type { DealsTabProps } from "../../../types/interfaces";
 
 export function DealsTab({ deals }: DealsTabProps) {
   if (deals.length === 0) {

@@ -1,8 +1,5 @@
 import { Chip } from "@mui/material";
-
-interface StatusBadgeProps {
-  status: string;
-}
+import type { StatusBadgeProps } from "../../types/interfaces";
 
 export function StatusBadge({ status }: StatusBadgeProps) {
   const getColor = (status: string): "success" | "info" | "warning" | "error" | "default" => {

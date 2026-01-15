@@ -3,17 +3,7 @@ import { ChevronDown, ChevronRight, X, Merge, Network, Undo2 } from "lucide-reac
 import { Card, CardContent, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography, Box, Alert, IconButton, Divider } from "@mui/material";
 import { formatUSD } from "../../../utils/formatters";
 import { GridSection, CellKey, GridRow } from "../../../types";
-
-interface DataGridTabProps {
-  gridData: GridSection[];
-  expandedRows: Set<string>;
-  selectedCells: Set<CellKey>;
-  onToggleRow: (id: string) => void;
-  onToggleCell: (cellKey: CellKey) => void;
-  onClearSelection: () => void;
-  selectedSum: number;
-  onUpdateGridData: (newData: GridSection[]) => void;
-}
+import type { DataGridTabProps } from "../../../types/interfaces";
 
 export function DataGridTab({
   gridData,

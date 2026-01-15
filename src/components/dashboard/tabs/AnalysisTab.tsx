@@ -1,10 +1,7 @@
 import { Card, CardContent, Typography, Chip, Divider, Box, Grid } from "@mui/material";
 import { formatUSD } from "../../../utils/formatters";
 import { GridSection } from "../../../types";
-
-interface AnalysisTabProps {
-  gridData: GridSection[];
-}
+import type { AnalysisTabProps } from "../../../types/interfaces";
 
 export function AnalysisTab({ gridData }: AnalysisTabProps) {
   return (

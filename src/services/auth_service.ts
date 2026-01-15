@@ -1,13 +1,5 @@
-const API_BASE_URL = 'https://atomic-leshia-reddy-rentals-c91628b8.koyeb.app';
-
-interface UserProfile {
-  name: string;
-  mobile_number: string;
-  email: string;
-  zip_code: string;
-  address: string;
-  company_ids: string[];
-}
+import { API_BASE_URL, API_ENDPOINTS } from '../config/api';
+import type { UserProfile } from '../types/interfaces';
 
 export const authService = {
   /**
@@ -19,7 +11,7 @@ export const authService = {
       console.log("🔍 Checking user profile for email:", email);
       
       // First, try to get user profile (backend extracts email from JWT)
-      const checkResponse = await fetch(`${API_BASE_URL}/client/get_client_profile`, {
+      const checkResponse = await fetch(`${API_BASE_URL}${API_ENDPOINTS.getClientProfile}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -46,13 +38,12 @@ export const authService = {
         mobile_number: user.phone_number || '',
         email: email,
         zip_code: '',
-        address: '',
-        company_ids: [],
+        address: ''
       };
 
       console.log("📝 Profile data to create:", newProfile);
 
-      const createResponse = await fetch(`${API_BASE_URL}/client/add_new_client`, {
+      const createResponse = await fetch(`${API_BASE_URL}${API_ENDPOINTS.addNewClient}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -92,7 +83,7 @@ export const authService = {
   },
   async fetchClientProfile(accessToken: string): Promise<any | null> {
     try {
-      const res = await fetch(`${API_BASE_URL}/client/get_client_profile`, {
+      const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.getClientProfile}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       if (!res.ok) return null;

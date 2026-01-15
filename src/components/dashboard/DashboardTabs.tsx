@@ -8,23 +8,7 @@ import { DataGridTab } from "./tabs/DataGridTab";
 import { UploadTab } from "./tabs/UploadTab";
 import { EditExtractionTab } from "./tabs/EditExtractionTab";
 import { AnalysisTab } from "./tabs/AnalysisTab";
-
-interface DashboardTabsProps {
-  deals: Deal[];
-  gridData: GridSection[];
-  expandedRows: Set<string>;
-  selectedCells: Set<CellKey>;
-  files: UploadedFile[];
-  selectedSum: number;
-  companyId?: string;
-  onToggleRow: (id: string) => void;
-  onToggleCell: (cellKey: CellKey) => void;
-  onClearSelection: () => void;
-  onAddFiles: (files: UploadedFile[]) => void;
-  onRemoveFile: (index: number) => void;
-  onUpdateFileStatementType: (index: number, statementType: FinancialStatementType) => void;
-  onUpdateGridData: (newData: GridSection[]) => void;
-}
+import type { DashboardTabsProps } from "../../types/interfaces";
 
 export function DashboardTabs({
   deals,

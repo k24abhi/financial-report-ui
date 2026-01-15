@@ -1,10 +1,6 @@
 import { Building2, Filter, Download } from "lucide-react";
 import { Button, Select, MenuItem, FormControl, InputLabel, AppBar, Toolbar, Box, Typography } from "@mui/material";
-
-interface DashboardHeaderProps {
-  statusFilter: string;
-  onStatusFilterChange: (value: string) => void;
-}
+import type { DashboardHeaderProps } from "../../types/interfaces";
 
 export function DashboardHeader({ statusFilter, onStatusFilterChange }: DashboardHeaderProps) {
   return (

@@ -10,10 +10,7 @@ import tableData from "../../../data/response_1763405559153.json";
 type TableRow = Record<string, string>;
 type Table = TableRow[];
 
-interface EditExtractionTabProps {
-  companyId?: string;
-  files?: UploadedFile[];
-}
+import type { EditExtractionTabProps } from "../../../types/interfaces";
 
 export function EditExtractionTab({ companyId = "company_1", files = [] }: EditExtractionTabProps) {
   const [searchTerm, setSearchTerm] = useState("");

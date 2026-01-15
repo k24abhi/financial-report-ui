@@ -1,10 +1,7 @@
 import { MapPin, Building2, User } from "lucide-react";
 import { Card, CardContent, Chip, Box, Typography } from "@mui/material";
 import { Company } from "../../types";
-
-interface CompanyHeaderProps {
-  company: Company;
-}
+import type { CompanyHeaderProps } from "../../types/interfaces";
 
 export function CompanyHeader({ company }: CompanyHeaderProps) {
   return (

@@ -1,4 +1,12 @@
 import { API_BASE_URL, API_ENDPOINTS } from '../config/api';
+import type { ExtractDataParams, ExtractedData, ClientDetails, CompanyDetails } from '../types/interfaces';
+
+// Token getter function - to be set by the app
+let getTokenFunction: (() => Promise<string>) | null = null;
+
+export const setTokenGetter = (fn: () => Promise<string>) => {
+  getTokenFunction = fn;
+};
 
 // Generic API call function
 async function apiCall<T>(
@@ -7,17 +15,28 @@ async function apiCall<T>(
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
   
+  // Get token if available
+  let token: string | null = null;
+  if (getTokenFunction) {
+    try {
+      token = await getTokenFunction();
+    } catch (error) {
+      console.error('Failed to get auth token:', error);
+    }
+  }
+  
   try {
     const response = await fetch(url, {
       ...options,
       headers: {
         ...options.headers,
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
       },
     });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `API Error: ${response.statusText}`);
+      throw new Error(errorData.message || errorData.detail || `API Error: ${response.statusText}`);
     }
 
     return await response.json();
@@ -28,19 +47,6 @@ async function apiCall<T>(
 }
 
 // Data Extraction Services
-export interface ExtractDataParams {
-  file: File;
-  company_id: string;
-  date: string;
-  period_type: string;
-  extract_again?: boolean;
-}
-
-export interface ExtractedData {
-  tables?: any[];
-  [key: string]: any;
-}
-
 export const extractDataAPI = {
   async extractData(params: ExtractDataParams): Promise<ExtractedData> {
     const formData = new FormData();
@@ -113,16 +119,6 @@ export const extractDataAPI = {
 };
 
 // Client Services
-export interface ClientDetails {
-  client_id?: string;
-  name: string;
-  mobile_number: string;
-  email: string;
-  zip_code: string;
-  address: string;
-  company_ids?: string[];
-}
-
 export const clientAPI = {
   async addNewClient(details: ClientDetails) {
     return apiCall(API_ENDPOINTS.addNewClient, {
@@ -142,13 +138,6 @@ export const clientAPI = {
 };
 
 // Company Services
-export interface CompanyDetails {
-  client_id: string;
-  company_name: string;
-  address: string;
-  industry: string;
-}
-
 export const companyAPI = {
   async getClientCompanies(client_id: string) {
     const queryParams = new URLSearchParams({ client_id });

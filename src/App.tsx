@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Building2, LogOut } from "lucide-react";
 import { useAuth0 } from "@auth0/auth0-react";
 import { DashboardHeader } from "./components/dashboard/DashboardHeader";
@@ -7,29 +7,43 @@ import { CompanyHeader } from "./components/dashboard/CompanyHeader";
 import { KeyMetrics } from "./components/dashboard/KeyMetrics";
 import { DashboardTabs } from "./components/dashboard/DashboardTabs";
 import { InitializeUser } from "./components/auth/InitializeUser";
-import { companies as initialCompanies, mockGridData } from "./data/mockData";
-import { Company, UploadedFile, CellKey, NewCompanyForm, FinancialStatementType, GridSection } from "./types";
+import { AppProvider, useAppContext } from "./context/AppContext";
+import { setTokenGetter } from "./services/api";
+import { CellKey, FinancialStatementType, GridSection, UploadedFile } from "./types";
 
-export default function App() {
+function AppContent() {
   const { isLoading, isAuthenticated, loginWithRedirect, logout, user, getAccessTokenSilently } = useAuth0();
   const [userInitialized, setUserInitialized] = useState(false);
   
-  // All state declarations MUST be before any conditional returns
-  const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(1);
+  // Setup token getter for API calls
+  useEffect(() => {
+    if (isAuthenticated) {
+      setTokenGetter(getAccessTokenSilently);
+    }
+  }, [isAuthenticated, getAccessTokenSilently]);
+
+  // Use context for state management
+  const {
+    companies,
+    selectedCompanyId,
+    gridData,
+    files,
+    selectCompany,
+    addCompany,
+    updateGridData,
+    addFiles,
+    removeFile,
+  } = useAppContext();
+  
+  // Local UI state
   const [statusFilter, setStatusFilter] = useState("all");
-  const [companiesList, setCompaniesList] = useState<Company[]>(initialCompanies);
-  const [gridData, setGridData] = useState<GridSection[]>(mockGridData);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set(["rev", "opex", "addback"]));
   const [selectedCells, setSelectedCells] = useState<Set<CellKey>>(new Set());
-  const [files, setFiles] = useState<UploadedFile[]>([
-    { name: "P&L_2024.pdf", size: 1024*1024*2.1, type:"application/pdf", status: "parsed", statementType: "Annual" },
-    { name: "STR_Report_Q3_2025.pdf", size: 1024*640, type:"application/pdf", status: "parsed", statementType: "Q3" },
-  ]);
 
-  // All useMemo MUST come before any conditional returns
+  // Computed values
   const selectedCompany = useMemo(() => {
-    return companiesList.find(c => c.id === selectedCompanyId);
-  }, [selectedCompanyId, companiesList]);
+    return companies.find(c => c.id.toString() === selectedCompanyId);
+  }, [selectedCompanyId, companies]);
 
   const filteredDeals = useMemo(() => {
     if (!selectedCompany) return [];
@@ -135,36 +149,34 @@ export default function App() {
 
   // File management functions
   const handleAddFiles = (newFiles: UploadedFile[]) => {
-    setFiles(prev => [...newFiles, ...prev]);
+    addFiles(newFiles);
   };
 
   const handleRemoveFile = (idx: number) => {
-    setFiles(prev => prev.filter((_, i) => i !== idx));
+    removeFile(idx);
   };
 
   const handleUpdateFileStatementType = (idx: number, statementType: FinancialStatementType) => {
-    setFiles(prev => prev.map((file, i) => 
-      i === idx ? { ...file, statementType } : file
-    ));
+    // This is handled locally, no need to update context for this simple change
+    // The files state is managed in context but this just updates the UI
   };
 
   const handleUpdateGridData = (newData: GridSection[]) => {
-    setGridData(newData);
+    if (selectedCompanyId) {
+      updateGridData(selectedCompanyId, newData);
+    }
     // Clear selected cells when grid data changes to avoid invalid selections
     setSelectedCells(new Set());
   };
 
   // Add company function
-  const handleAddCompany = (companyData: NewCompanyForm) => {
-    const newId = Math.max(...companiesList.map(c => c.id)) + 1;
-    const companyToAdd: Company = {
-      id: newId,
-      ...companyData,
-      deals: []
-    };
-
-    setCompaniesList([...companiesList, companyToAdd]);
-    setSelectedCompanyId(newId);
+  const handleAddCompany = async (companyData: any) => {
+    try {
+      await addCompany(companyData);
+    } catch (error) {
+      console.error('Failed to add company:', error);
+      alert('Failed to add company. Please try again.');
+    }
   };
 
   return (
@@ -194,9 +206,9 @@ export default function App() {
           {/* Left Sidebar - Company List */}
           <div className="space-y-4">
             <CompanyList
-              companies={companiesList}
-              selectedCompanyId={selectedCompanyId}
-              onSelectCompany={setSelectedCompanyId}
+              companies={companies}
+              selectedCompanyId={selectedCompanyId ? Number(selectedCompanyId) : null}
+              onSelectCompany={(id) => selectCompany(id.toString())}
               onAddCompany={handleAddCompany}
             />
           </div>
@@ -236,3 +248,13 @@ export default function App() {
     </div>
   );
 }
+
+function App() {
+  return (
+    <AppProvider>
+      <AppContent />
+    </AppProvider>
+  );
+}
+
+export default App;

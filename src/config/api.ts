@@ -8,6 +8,8 @@ export const API_ENDPOINTS = {
   updateExtractedData: '/extractor/update_extracted_data',
   
   // Client Details
+  checkAndInit: '/client/check_and_init',
+  getClientProfile: '/client/get_client_profile',
   updateClientDetails: '/client/update_client_details',
   addNewClient: '/client/add_new_client',
   getAllClients: '/client/get_all_clients',

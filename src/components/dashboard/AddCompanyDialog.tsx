@@ -8,12 +8,7 @@ import {
   Button 
 } from "@mui/material";
 import { NewCompanyForm } from "../../types";
-
-interface AddCompanyDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onAddCompany: (company: NewCompanyForm) => void;
-}
+import type { AddCompanyDialogProps } from "../../types/interfaces";
 
 export function AddCompanyDialog({ open, onOpenChange, onAddCompany }: AddCompanyDialogProps) {
   const [newCompany, setNewCompany] = useState<NewCompanyForm>({
