@@ -24,7 +24,8 @@ export function DashboardTabs({
   onAddFiles,
   onRemoveFile,
   onUpdateFileStatementType,
-  onUpdateGridData
+  onUpdateGridData,
+  onExportData
 }: DashboardTabsProps) {
   const [activeTab, setActiveTab] = useState(0);
 
@@ -63,7 +64,7 @@ export function DashboardTabs({
             companyId={companyId}
           />
         )}
-        {activeTab === 4 && <EditExtractionTab companyId={companyId} files={files} />}
+        {activeTab === 4 && <EditExtractionTab companyId={companyId} files={files} onTabChange={setActiveTab} onExportData={onExportData} />}
         {activeTab === 5 && <AnalysisTab gridData={gridData} />}
       </Box>
     </Box>

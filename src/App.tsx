@@ -15,10 +15,23 @@ function AppContent() {
   const { isLoading, isAuthenticated, loginWithRedirect, logout, user, getAccessTokenSilently } = useAuth0();
   const [userInitialized, setUserInitialized] = useState(false);
   
-  // Setup token getter for API calls
+  // Setup token getter for API calls and log token
   useEffect(() => {
     if (isAuthenticated) {
       setTokenGetter(getAccessTokenSilently);
+      
+      // Log the token for testing
+      getAccessTokenSilently().then(token => {
+        console.log('='.repeat(80));
+        console.log('AUTH TOKEN FOR BACKEND TESTING:');
+        console.log('='.repeat(80));
+        console.log(token);
+        console.log('='.repeat(80));
+        console.log('Copy the token above to test your backend API');
+        console.log('='.repeat(80));
+      }).catch(err => {
+        console.error('Failed to get token:', err);
+      });
     }
   }, [isAuthenticated, getAccessTokenSilently]);
 
@@ -42,7 +55,13 @@ function AppContent() {
 
   // Computed values
   const selectedCompany = useMemo(() => {
-    return companies.find(c => c.id.toString() === selectedCompanyId);
+    const company = companies.find(c => c.id === selectedCompanyId);
+    console.log('🏢 Selected Company Debug:');
+    console.log('  - selectedCompanyId:', selectedCompanyId);
+    console.log('  - companies:', companies);
+    console.log('  - found company:', company);
+    console.log('  - company.id:', company?.id);
+    return company;
   }, [selectedCompanyId, companies]);
 
   const filteredDeals = useMemo(() => {
@@ -169,6 +188,110 @@ function AppContent() {
     setSelectedCells(new Set());
   };
 
+  const handleExportData = (exportedData: any) => {
+    console.log('📤 Exported data from Edit Extraction:', exportedData);
+    
+    if (!exportedData || !Array.isArray(exportedData)) return;
+
+    // Transform table data into grid format
+    const transformedData: GridSection[] = [];
+    const revenueChildren: any[] = [];
+    const opexChildren: any[] = [];
+    const addbackChildren: any[] = [];
+
+    exportedData.forEach((row: any) => {
+      const col0 = row['0'] || '';
+      const col1 = row['1'] || '';
+      const col2 = row['2'] || '';
+      
+      // Parse account name and value
+      const accountName = col1.trim() || col0.trim();
+      const valueStr = col2.replace(/,/g, '').trim();
+      const value = valueStr && !isNaN(parseFloat(valueStr)) ? parseFloat(valueStr) : 0;
+
+      // Skip empty rows, headers, and subtotals
+      if (!accountName || 
+          accountName.includes('Profit & Loss') || 
+          accountName.includes('Accrual Basis') ||
+          accountName.includes('Income/Expense') ||
+          accountName.includes('Hotels') ||
+          accountName === 'Income' ||
+          accountName === 'Expense' ||
+          accountName === 'Other Expense' ||
+          accountName.startsWith('Total ') ||
+          accountName.startsWith('Net ') ||
+          accountName.startsWith('Gross ')) {
+        return;
+      }
+
+      // Categorize items
+      if (accountName.toLowerCase().includes('sales') || 
+          accountName.toLowerCase().includes('revenue') ||
+          accountName.toLowerCase().includes('income')) {
+        revenueChildren.push({
+          id: accountName.toLowerCase().replace(/\s+/g, '-'),
+          account: accountName,
+          y2023: 0,
+          y2024: value,
+          ytd2025: 0
+        });
+      } else if (accountName.toLowerCase().includes('depreciation') ||
+                 accountName.toLowerCase().includes('amortization') ||
+                 accountName.toLowerCase().includes('interest expense')) {
+        addbackChildren.push({
+          id: accountName.toLowerCase().replace(/\s+/g, '-'),
+          account: accountName,
+          y2023: 0,
+          y2024: value,
+          ytd2025: 0
+        });
+      } else if (value > 0) {
+        opexChildren.push({
+          id: accountName.toLowerCase().replace(/\s+/g, '-'),
+          account: accountName,
+          y2023: 0,
+          y2024: value,
+          ytd2025: 0
+        });
+      }
+    });
+
+    // Build sections
+    if (revenueChildren.length > 0) {
+      transformedData.push({
+        id: 'rev',
+        category: 'Revenue',
+        isParent: true,
+        children: revenueChildren
+      });
+    }
+
+    if (opexChildren.length > 0) {
+      transformedData.push({
+        id: 'opex',
+        category: 'Operating Expenses',
+        isParent: true,
+        children: opexChildren
+      });
+    }
+
+    if (addbackChildren.length > 0) {
+      transformedData.push({
+        id: 'addback',
+        category: 'Add-backs',
+        isParent: true,
+        children: addbackChildren
+      });
+    }
+
+    console.log('📊 Transformed grid data:', transformedData);
+    
+    // Update the grid data
+    if (transformedData.length > 0 && selectedCompanyId) {
+      updateGridData(selectedCompanyId, transformedData);
+    }
+  };
+
   // Add company function
   const handleAddCompany = async (companyData: any) => {
     try {
@@ -207,8 +330,8 @@ function AppContent() {
           <div className="space-y-4">
             <CompanyList
               companies={companies}
-              selectedCompanyId={selectedCompanyId ? Number(selectedCompanyId) : null}
-              onSelectCompany={(id) => selectCompany(id.toString())}
+              selectedCompanyId={selectedCompanyId}
+              onSelectCompany={(id) => selectCompany(id)}
               onAddCompany={handleAddCompany}
             />
           </div>
@@ -227,7 +350,7 @@ function AppContent() {
                 selectedCells={selectedCells}
                 files={files}
                 selectedSum={selectedSum}
-                companyId={selectedCompany.id.toString()}
+                companyId={selectedCompany.id || "company_1"}
                 onToggleRow={toggleRow}
                 onToggleCell={toggleCell}
                 onClearSelection={clearCellSelection}
@@ -235,6 +358,7 @@ function AppContent() {
                 onRemoveFile={handleRemoveFile}
                 onUpdateFileStatementType={handleUpdateFileStatementType}
                 onUpdateGridData={handleUpdateGridData}
+                onExportData={handleExportData}
               />
             </div>
           ) : (

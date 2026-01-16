@@ -4,9 +4,14 @@ import type { Company, NewCompanyForm } from '../types';
 export type CompanyId = string | number;
 
 function toCompany(detail: any): Company {
+  console.log('🔍 Backend company detail response:', detail);
+  
   // Map backend details to UI Company type
+  const companyId = detail?.company_id ?? detail?.id;
+  console.log('  - Extracted company_id:', companyId);
+  
   return {
-    id: Number(detail?.company_id ?? detail?.id ?? Math.floor(Math.random()*100000)),
+    id: companyId || `temp-${Date.now()}`,
     name: detail?.company_name ?? detail?.name ?? 'Unknown Company',
     type: detail?.type ?? 'Unknown',
     location: detail?.address ?? detail?.location ?? 'Unknown',

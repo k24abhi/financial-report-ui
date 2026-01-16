@@ -17,7 +17,7 @@ export interface Deal {
 }
 
 export interface Company {
-  id: number;
+  id: string;
   name: string;
   type: string;
   location: string;
@@ -141,6 +141,7 @@ export interface DashboardTabsProps {
   onRemoveFile: (index: number) => void;
   onUpdateFileStatementType: (index: number, statementType: FinancialStatementType) => void;
   onUpdateGridData: (newData: GridSection[]) => void;
+  onExportData?: (data: any) => void;
 }
 
 export interface KeyMetricsProps {
@@ -169,6 +170,8 @@ export interface DataGridTabProps {
 export interface EditExtractionTabProps {
   companyId?: string;
   files?: UploadedFile[];
+  onTabChange?: (tabIndex: number) => void;
+  onExportData?: (data: any) => void;
 }
 
 export interface UploadTabProps {
@@ -181,8 +184,8 @@ export interface UploadTabProps {
 
 export interface CompanyListProps {
   companies: Company[];
-  selectedCompanyId: number | null;
-  onSelectCompany: (id: number) => void;
+  selectedCompanyId: string | null;
+  onSelectCompany: (id: string) => void;
   onAddCompany: (company: Omit<Company, "id" | "deals">) => void;
 }
 
