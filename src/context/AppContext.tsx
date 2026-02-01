@@ -249,20 +249,33 @@ function transformGridData(apiData: any): GridSection[] {
   const categoriesMap = new Map<string, GridRow[]>();
   
   apiData.grid_data.forEach((row: any) => {
-    const category = row['0'] || 'Other'; // Column 0 is the category/label
+    // New format: row may contain explicit `category` and `account` keys
+    // Legacy format: row['0'] contains the account label
+    let category: string;
+    let account: string;
+
+    if (row.hasOwnProperty('category')) {
+      category = (row['category'] || 'Other').toString();
+      account = (row['account'] || row['0'] || 'Unknown').toString();
+    } else {
+      // Legacy rows: place under a single Imported category to avoid creating one-section-per-account
+      category = 'Imported';
+      account = (row['0'] || row['account'] || 'Unknown').toString();
+    }
+
     if (!categoriesMap.has(category)) {
       categoriesMap.set(category, []);
     }
-    
+
     // Convert row data to GridRow format
     const gridRow: GridRow = {
       id: `row_${row.id || Math.random()}`,
-      account: category,
+      account,
       y2023: parseFloat(row['1'] || 0),
       y2024: parseFloat(row['2'] || 0),
       ytd2025: parseFloat(row['3'] || 0),
     };
-    
+
     categoriesMap.get(category)!.push(gridRow);
   });
 
@@ -287,9 +300,11 @@ function transformGridDataForAPI(gridSections: GridSection[]): any {
   let rowIndex = 0;
   gridSections.forEach(section => {
     section.children.forEach(row => {
+      // Store both category and account explicitly so reload preserves grouping
       grid_data.push({
         id: rowIndex++,
-        '0': row.account,
+        category: section.category,
+        account: row.account,
         '1': row.y2023.toString(),
         '2': row.y2024.toString(),
         '3': row.ytd2025.toString(),
@@ -299,7 +314,7 @@ function transformGridDataForAPI(gridSections: GridSection[]): any {
 
   return {
     grid_data,
-    header_columns: ['0'],
+    header_columns: ['category','account'],
     col_period_mapping,
   };
 }

@@ -32,10 +32,21 @@ export function EditExtractionTab({ companyId = "company_1", files = [], onTabCh
   }, [files]);
 
   const handleExport = () => {
-    // Export the current table data
+    // Export the current table data with metadata
     if (loadedTables && loadedTables.length > 0) {
       const currentTable = loadedTables[selectedTable];
-      onExportData?.(currentTable);
+      
+      // Get metadata from selected file or manual inputs
+      const metadata = {
+        date: selectedFileIndex !== null && parsedFiles[selectedFileIndex] 
+          ? parsedFiles[selectedFileIndex].date 
+          : selectedDate,
+        periodType: selectedFileIndex !== null && parsedFiles[selectedFileIndex]
+          ? parsedFiles[selectedFileIndex].period_type
+          : selectedPeriodType
+      };
+      
+      onExportData?.(currentTable, metadata);
       onTabChange?.(2); // Switch to Data Grid tab
     }
   };

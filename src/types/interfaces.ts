@@ -171,7 +171,7 @@ export interface EditExtractionTabProps {
   companyId?: string;
   files?: UploadedFile[];
   onTabChange?: (tabIndex: number) => void;
-  onExportData?: (data: any) => void;
+  onExportData?: (data: any, metadata?: { date?: string; periodType?: string }) => void;
 }
 
 export interface UploadTabProps {

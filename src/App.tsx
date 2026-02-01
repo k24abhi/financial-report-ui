@@ -188,107 +188,125 @@ function AppContent() {
     setSelectedCells(new Set());
   };
 
-  const handleExportData = (exportedData: any) => {
+  const handleExportData = (exportedData: any, metadata?: { date?: string; periodType?: string }) => {
     console.log('📤 Exported data from Edit Extraction:', exportedData);
+    console.log('📅 Metadata:', metadata);
     
     if (!exportedData || !Array.isArray(exportedData)) return;
 
-    // Transform table data into grid format
-    const transformedData: GridSection[] = [];
-    const revenueChildren: any[] = [];
-    const opexChildren: any[] = [];
-    const addbackChildren: any[] = [];
+    // Require period date from the exported file/metadata — do not assume a default year
+    const periodDate = metadata?.date;
+    if (!periodDate) {
+      console.warn('Export aborted: missing period date in metadata.');
+      // Inform the user to set the period date in Edit Extraction before exporting
+      alert('Please set a period date in Edit Extraction (or select a parsed file) before exporting to the Data Grid.');
+      return;
+    }
+
+    const targetYear = new Date(periodDate).getFullYear();
+    console.log('📊 Target year:', targetYear);
+
+    // Transform and MERGE table data into existing grid format (preserve other years)
+    const mapCategory = (accountName: string) => {
+      const lower = accountName.toLowerCase();
+      if (lower.includes('sales') || lower.includes('revenue') || lower.includes('income')) return 'Revenue';
+      if (lower.includes('depreciation') || lower.includes('amortization') || lower.includes('interest expense')) return 'Add-backs';
+      return 'Operating Expenses';
+    };
+
+    // Helper to sanitize account and value
+    const parseRow = (row: any) => {
+      const keys = Object.keys(row).filter(k => k !== undefined).sort((a, b) => parseInt(a) - parseInt(b));
+
+      // Account name: first non-empty left-most text-like cell
+      let accountName = '';
+      for (let i = 0; i < Math.min(2, keys.length); i++) {
+        const v = row[keys[i]];
+        if (v !== undefined && v !== null && v.toString().trim() !== '') {
+          accountName = v.toString().trim();
+          break;
+        }
+      }
+
+      // Value: find the right-most cell that looks numeric
+      let value = 0;
+      for (let i = keys.length - 1; i >= 0; i--) {
+        const raw = row[keys[i]];
+        if (raw === undefined || raw === null) continue;
+        const s = raw.toString().trim();
+        if (!s) continue;
+
+        // Detect digits or parentheses indicating a number
+        if (/[0-9]/.test(s)) {
+          // Remove non-number characters except . and - and parentheses
+          const cleaned = s.replace(/[^0-9.\-()]/g, '');
+          // Handle parentheses as negative numbers
+          const negative = cleaned.includes('(') && cleaned.includes(')');
+          const numericStr = cleaned.replace(/[()]/g, '');
+          const parsed = parseFloat(numericStr);
+          if (!isNaN(parsed)) {
+            value = negative ? -parsed : parsed;
+            break;
+          }
+        }
+      }
+
+      return { accountName, value };
+    };
+
+    // Start from existing grid data (clone)
+    const baseGrid = JSON.parse(JSON.stringify(gridData || [])) as GridSection[];
+
+    // Ensure standard sections exist
+    const getSectionByCategory = (category: string) => baseGrid.find(s => s.category === category);
+    const ensureSection = (category: string) => {
+      let s = getSectionByCategory(category);
+      if (!s) {
+        s = { id: category.toLowerCase().slice(0,6), category, isParent: true, children: [] } as GridSection;
+        baseGrid.push(s);
+      }
+      return s;
+    };
 
     exportedData.forEach((row: any) => {
-      const col0 = row['0'] || '';
-      const col1 = row['1'] || '';
-      const col2 = row['2'] || '';
-      
-      // Parse account name and value
-      const accountName = col1.trim() || col0.trim();
-      const valueStr = col2.replace(/,/g, '').trim();
-      const value = valueStr && !isNaN(parseFloat(valueStr)) ? parseFloat(valueStr) : 0;
+      const { accountName, value } = parseRow(row);
 
-      // Skip empty rows, headers, and subtotals
-      if (!accountName || 
-          accountName.includes('Profit & Loss') || 
-          accountName.includes('Accrual Basis') ||
-          accountName.includes('Income/Expense') ||
-          accountName.includes('Hotels') ||
-          accountName === 'Income' ||
-          accountName === 'Expense' ||
-          accountName === 'Other Expense' ||
-          accountName.startsWith('Total ') ||
-          accountName.startsWith('Net ') ||
-          accountName.startsWith('Gross ')) {
-        return;
+      if (!accountName) return;
+      // Skip obvious header/total rows
+      const skipIf = ['profit & loss','accrual basis','income/expense','hotels','income','expense','other expense'];
+      if (skipIf.some(p => accountName.toLowerCase().includes(p))) return;
+      if (accountName.startsWith('Total ') || accountName.startsWith('Net ') || accountName.startsWith('Gross ')) return;
+
+      const category = mapCategory(accountName);
+      const section = ensureSection(category);
+
+      const id = accountName.toLowerCase().replace(/\s+/g, '-');
+
+      // Find existing row by id (use index to avoid "possibly undefined" narrow)
+      let existingIndex = section.children.findIndex((c: any) => c.id === id || c.account === accountName);
+      if (existingIndex === -1) {
+        const newRow = { id, account: accountName, y2023: 0, y2024: 0, ytd2025: 0 } as any;
+        section.children.push(newRow);
+        existingIndex = section.children.length - 1;
       }
 
-      // Categorize items
-      if (accountName.toLowerCase().includes('sales') || 
-          accountName.toLowerCase().includes('revenue') ||
-          accountName.toLowerCase().includes('income')) {
-        revenueChildren.push({
-          id: accountName.toLowerCase().replace(/\s+/g, '-'),
-          account: accountName,
-          y2023: 0,
-          y2024: value,
-          ytd2025: 0
-        });
-      } else if (accountName.toLowerCase().includes('depreciation') ||
-                 accountName.toLowerCase().includes('amortization') ||
-                 accountName.toLowerCase().includes('interest expense')) {
-        addbackChildren.push({
-          id: accountName.toLowerCase().replace(/\s+/g, '-'),
-          account: accountName,
-          y2023: 0,
-          y2024: value,
-          ytd2025: 0
-        });
-      } else if (value > 0) {
-        opexChildren.push({
-          id: accountName.toLowerCase().replace(/\s+/g, '-'),
-          account: accountName,
-          y2023: 0,
-          y2024: value,
-          ytd2025: 0
-        });
-      }
+      const existing = section.children[existingIndex] as any;
+
+      // Set the value for the target year (replace existing value for that year)
+      if (targetYear === 2023) existing.y2023 = value;
+      if (targetYear === 2024) existing.y2024 = value;
+      if (targetYear === 2025) existing.ytd2025 = value;
     });
 
-    // Build sections
-    if (revenueChildren.length > 0) {
-      transformedData.push({
-        id: 'rev',
-        category: 'Revenue',
-        isParent: true,
-        children: revenueChildren
-      });
-    }
+    // Sort children within sections by account name for determinism
+    baseGrid.forEach(s => {
+      s.children.sort((a: any, b: any) => a.account.localeCompare(b.account));
+    });
 
-    if (opexChildren.length > 0) {
-      transformedData.push({
-        id: 'opex',
-        category: 'Operating Expenses',
-        isParent: true,
-        children: opexChildren
-      });
-    }
+    console.log('📊 Merged transformed grid data:', baseGrid);
 
-    if (addbackChildren.length > 0) {
-      transformedData.push({
-        id: 'addback',
-        category: 'Add-backs',
-        isParent: true,
-        children: addbackChildren
-      });
-    }
-
-    console.log('📊 Transformed grid data:', transformedData);
-    
-    // Update the grid data
-    if (transformedData.length > 0 && selectedCompanyId) {
-      updateGridData(selectedCompanyId, transformedData);
+    if (baseGrid.length > 0 && selectedCompanyId) {
+      updateGridData(selectedCompanyId, baseGrid);
     }
   };
 

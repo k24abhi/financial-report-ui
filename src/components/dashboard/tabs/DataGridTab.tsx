@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ChevronDown, ChevronRight, X, Merge, Network, Undo2 } from "lucide-react";
+import { ChevronDown, ChevronRight, X, Merge, Network, Undo2, Trash2 } from "lucide-react";
 import { Card, CardContent, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography, Box, Alert, IconButton, Divider } from "@mui/material";
 import { formatUSD } from "../../../utils/formatters";
 import { GridSection, CellKey, GridRow } from "../../../types";
@@ -55,6 +55,16 @@ export function DataGridTab({
       const lastState = undoHistory[undoHistory.length - 1];
       setUndoHistory(prev => prev.slice(0, -1));
       onUpdateGridData(lastState);
+    }
+  };
+
+  // Clear all data
+  const handleClearAll = () => {
+    if (window.confirm('Are you sure you want to remove all data from the grid? This action cannot be undone.')) {
+      onUpdateGridData([]);
+      setUndoHistory([]);
+      setMergeMode(false);
+      setChildMode(false);
     }
   };
 
@@ -292,6 +302,30 @@ export function DataGridTab({
                   >
                     <Undo2 style={{ width: 16, height: 16 }} />
                     Undo
+                  </Button>
+                </>
+              )}
+              {gridData.length > 0 && (
+                <>
+                  <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={handleClearAll}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      color: 'error.main',
+                      borderColor: 'error.main',
+                      '&:hover': {
+                        bgcolor: 'error.50',
+                        borderColor: 'error.main'
+                      }
+                    }}
+                  >
+                    <Trash2 style={{ width: 16, height: 16 }} />
+                    Clear All
                   </Button>
                 </>
               )}
