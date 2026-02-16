@@ -116,6 +116,47 @@ export const extractDataAPI = {
       }
     );
   },
+
+  // Get available periods for a company
+  async getAvailablePeriods(
+    company_id: string,
+    client_id: string
+  ): Promise<{ status: string; data: Array<{period: string, period_type: string}> }> {
+    const queryParams = new URLSearchParams({
+      company_id,
+      client_id,
+    });
+
+    return apiCall(
+      `${API_ENDPOINTS.getAvailablePeriods}?${queryParams}`,
+      {
+        method: 'GET',
+      }
+    );
+  },
+
+  // Get extracted data for a specific period
+  async getExtractedDataByPeriod(
+    company_id: string,
+    client_id: string,
+    period?: string
+  ): Promise<any> {
+    const queryParams = new URLSearchParams({
+      company_id,
+      client_id,
+    });
+    
+    if (period) {
+      queryParams.append('period', period);
+    }
+
+    return apiCall(
+      `${API_ENDPOINTS.getExtractedDataByPeriod}?${queryParams}`,
+      {
+        method: 'GET',
+      }
+    );
+  },
 };
 
 // Client Services
@@ -180,7 +221,7 @@ export const companyAPI = {
   },
 };
 
-// Data Grid Services
+// Hierarchy Grid Services
 export const dataGridAPI = {
   async fetchAllPeriodData(client_id: string, company_id: string) {
     const queryParams = new URLSearchParams({ client_id, company_id });

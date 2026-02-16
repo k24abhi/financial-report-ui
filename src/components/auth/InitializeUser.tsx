@@ -23,17 +23,14 @@ export const InitializeUser: React.FC<InitializeUserProps> = ({ onUserReady }) =
 
       try {
         setIsInitializing(true);
-        console.log("🔄 Initializing user...");
         
         const token = await getAccessTokenSilently();
         
         // This will check if user exists and create if needed
         await authService.checkOrCreateUser(user, token);
         
-        console.log("✅ User initialization complete");
         onUserReady();
       } catch (err) {
-        console.error("❌ User initialization failed:", err);
         setError(err instanceof Error ? err.message : "Failed to initialize user");
       } finally {
         setIsInitializing(false);

@@ -1,0 +1,1216 @@
+{
+    "roots": [
+        {
+            "id": 1,
+            "label": "MAITRI PRIYA LLC",
+            "values": [],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 2,
+            "label": "38 S Allison Ave",
+            "values": [],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 3,
+            "label": "Xenia, OH 45385",
+            "values": [],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 4,
+            "label": "Financial Statement",
+            "values": [],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 5,
+            "label": "December 31, 2024",
+            "values": [],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 6,
+            "label": "MAITRI",
+            "values": [
+                {
+                    "id": 7,
+                    "text": "PRIYA LLC"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 8,
+            "label": "Balance",
+            "values": [
+                {
+                    "id": 9,
+                    "text": "Sheet"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 10,
+            "label": "As of December",
+            "values": [
+                {
+                    "id": 11,
+                    "text": "31, 2024"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 12,
+            "label": "Assets",
+            "values": [
+                {
+                    "id": 13,
+                    "text": ""
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 14,
+            "label": "Current Assets",
+            "values": [
+                {
+                    "id": 15,
+                    "text": ""
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 16,
+            "label": "Petty Cash",
+            "values": [
+                {
+                    "id": 17,
+                    "text": "$ 500.00"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 18,
+            "label": "Checking: General",
+            "values": [
+                {
+                    "id": 19,
+                    "text": "78,582.65"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 20,
+            "label": "Cash on Hand",
+            "values": [
+                {
+                    "id": 21,
+                    "text": "56,739.00"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 22,
+            "label": "Total Current Assets",
+            "values": [
+                {
+                    "id": 23,
+                    "text": "135,821.65"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 24,
+            "label": "Property and Equipment",
+            "values": [
+                {
+                    "id": 25,
+                    "text": ""
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 26,
+            "label": "Furniture & Fixtures",
+            "values": [
+                {
+                    "id": 27,
+                    "text": "90,822.54"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 28,
+            "label": "Equipment",
+            "values": [
+                {
+                    "id": 29,
+                    "text": "15,966.50"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 30,
+            "label": "Buildings",
+            "values": [
+                {
+                    "id": 31,
+                    "text": "843,970.00"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 32,
+            "label": "Land",
+            "values": [
+                {
+                    "id": 33,
+                    "text": "345,530.00"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 34,
+            "label": "Accumulated Depreciation",
+            "values": [
+                {
+                    "id": 35,
+                    "text": "(162,472.79)"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 36,
+            "label": "Automobiles",
+            "values": [
+                {
+                    "id": 37,
+                    "text": "13,000.00"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 38,
+            "label": "Net Property and Equipment",
+            "values": [
+                {
+                    "id": 39,
+                    "text": "1,146,816.25"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 40,
+            "label": "Non Current Assets",
+            "values": [
+                {
+                    "id": 41,
+                    "text": ""
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 42,
+            "label": "Goodwill",
+            "values": [
+                {
+                    "id": 43,
+                    "text": "217,500.00"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 44,
+            "label": "Accumulated Amortization",
+            "values": [
+                {
+                    "id": 45,
+                    "text": "(24,166.67)"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 46,
+            "label": "Total Non Current Assets",
+            "values": [
+                {
+                    "id": 47,
+                    "text": "193,333.33"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 48,
+            "label": "Total Assets",
+            "values": [
+                {
+                    "id": 49,
+                    "text": "$ 1,475,971.23"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 50,
+            "label": "Liabilities and",
+            "values": [
+                {
+                    "id": 51,
+                    "text": "Partners' Equity"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 52,
+            "label": "Current Liabilities",
+            "values": [
+                {
+                    "id": 53,
+                    "text": ""
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 54,
+            "label": "Credit Card Payable - 2349",
+            "values": [
+                {
+                    "id": 55,
+                    "text": "$ 95.34"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 56,
+            "label": "FICA Payable",
+            "values": [
+                {
+                    "id": 57,
+                    "text": "682.12"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 58,
+            "label": "School District W/H Payable",
+            "values": [
+                {
+                    "id": 59,
+                    "text": "46.88"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 60,
+            "label": "State W/H Payable",
+            "values": [
+                {
+                    "id": 61,
+                    "text": "68.66"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 62,
+            "label": "Local W/H Payable",
+            "values": [
+                {
+                    "id": 63,
+                    "text": "210.95"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 64,
+            "label": "Sales Tax Payable",
+            "values": [
+                {
+                    "id": 65,
+                    "text": "4,824.78"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 66,
+            "label": "Accomodation Tax Payable",
+            "values": [
+                {
+                    "id": 67,
+                    "text": "8,853.56"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 68,
+            "label": "Total Current Liabilities",
+            "values": [
+                {
+                    "id": 69,
+                    "text": "14,782.29"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 70,
+            "label": "Long-Term Liabilities",
+            "values": [
+                {
+                    "id": 71,
+                    "text": ""
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 72,
+            "label": "Land Contract Payable",
+            "values": [
+                {
+                    "id": 73,
+                    "text": "1,219,463.90"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 74,
+            "label": "Total Long-Term Liabilities",
+            "values": [
+                {
+                    "id": 75,
+                    "text": "1,219,463.90"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 76,
+            "label": "Total Liabilities",
+            "values": [
+                {
+                    "id": 77,
+                    "text": "1,234,246.19"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 78,
+            "label": "Partners' Equity",
+            "values": [
+                {
+                    "id": 79,
+                    "text": ""
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 80,
+            "label": "Distributions",
+            "values": [
+                {
+                    "id": 81,
+                    "text": "(324,016.66)"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 82,
+            "label": "Net Income",
+            "values": [
+                {
+                    "id": 83,
+                    "text": "255,439.87"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 84,
+            "label": "Retained Earnings",
+            "values": [
+                {
+                    "id": 85,
+                    "text": "310,301.83"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 86,
+            "label": "Total Partners' Equity",
+            "values": [
+                {
+                    "id": 87,
+                    "text": "241,725.04"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 88,
+            "label": "Total Liabilities and Partners' Equity",
+            "values": [
+                {
+                    "id": 89,
+                    "text": "$ 1,475,971.23"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 90,
+            "label": "No Assurance is",
+            "values": [
+                {
+                    "id": 91,
+                    "text": "Provided."
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 92,
+            "label": "MAITRI",
+            "values": [
+                {
+                    "id": 93,
+                    "text": "PRIYA LLC"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 94,
+            "label": "Income",
+            "values": [
+                {
+                    "id": 95,
+                    "text": "Statement"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 96,
+            "label": "",
+            "values": [
+                {
+                    "id": 97,
+                    "text": "12 Months Ended"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 98,
+            "label": "",
+            "values": [
+                {
+                    "id": 99,
+                    "text": "December 31, 2024"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 100,
+            "label": "Sales",
+            "values": [
+                {
+                    "id": 101,
+                    "text": ""
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 102,
+            "label": "Room Rents: Taxable",
+            "values": [
+                {
+                    "id": 103,
+                    "text": "719,733.99"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 104,
+            "label": "Room Rents: Non - Taxable",
+            "values": [
+                {
+                    "id": 105,
+                    "text": "34,217.48"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 106,
+            "label": "Total Sales",
+            "values": [
+                {
+                    "id": 107,
+                    "text": "753,951.47"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 108,
+            "label": "Gross Profit",
+            "values": [
+                {
+                    "id": 109,
+                    "text": "753,951.47"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 110,
+            "label": "Operating Expenses",
+            "values": [
+                {
+                    "id": 111,
+                    "text": ""
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 112,
+            "label": "Advertising",
+            "values": [
+                {
+                    "id": 113,
+                    "text": "2,550.00"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 114,
+            "label": "Amortization",
+            "values": [
+                {
+                    "id": 115,
+                    "text": "14,500.00"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 116,
+            "label": "Auto Expense",
+            "values": [
+                {
+                    "id": 117,
+                    "text": "6,063.36"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 118,
+            "label": "Bank Service Charges",
+            "values": [
+                {
+                    "id": 119,
+                    "text": "11,007.99"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 120,
+            "label": "Cable",
+            "values": [
+                {
+                    "id": 121,
+                    "text": "22,676.07"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 122,
+            "label": "Contributions",
+            "values": [
+                {
+                    "id": 123,
+                    "text": "5,301.00"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 124,
+            "label": "Depreciation Expense",
+            "values": [
+                {
+                    "id": 125,
+                    "text": "54,917.65"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 126,
+            "label": "Licenses & Fees",
+            "values": [
+                {
+                    "id": 127,
+                    "text": "125.00"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 128,
+            "label": "Insurance: Motel",
+            "values": [
+                {
+                    "id": 129,
+                    "text": "36,931.35"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 130,
+            "label": "Insurance: Automobile",
+            "values": [
+                {
+                    "id": 131,
+                    "text": "978.79"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 132,
+            "label": "Insurance - Workers Comp",
+            "values": [
+                {
+                    "id": 133,
+                    "text": "338.75"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 134,
+            "label": "Interest Expense",
+            "values": [
+                {
+                    "id": 135,
+                    "text": "85,383.79"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 136,
+            "label": "Meals",
+            "values": [
+                {
+                    "id": 137,
+                    "text": "453.74"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 138,
+            "label": "Office expenses",
+            "values": [
+                {
+                    "id": 139,
+                    "text": "2,320.04"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 140,
+            "label": "Professional Fees",
+            "values": [
+                {
+                    "id": 141,
+                    "text": "6,630.00"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 142,
+            "label": "Repairs and Maintenance",
+            "values": [
+                {
+                    "id": 143,
+                    "text": "73,010.76"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 144,
+            "label": "Commission Expense",
+            "values": [
+                {
+                    "id": 145,
+                    "text": "9,328.68"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 146,
+            "label": "Salaries: General",
+            "values": [
+                {
+                    "id": 147,
+                    "text": "37,500.00"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 148,
+            "label": "Supplies",
+            "values": [
+                {
+                    "id": 149,
+                    "text": "31,490.68"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 150,
+            "label": "Taxes: Other",
+            "values": [
+                {
+                    "id": 151,
+                    "text": "1,200.00"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 152,
+            "label": "Taxes: FICA",
+            "values": [
+                {
+                    "id": 153,
+                    "text": "2,868.77"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 154,
+            "label": "Taxes: FUTA",
+            "values": [
+                {
+                    "id": 155,
+                    "text": "42.00"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 156,
+            "label": "Taxes: SUTA",
+            "values": [
+                {
+                    "id": 157,
+                    "text": "81.00"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 158,
+            "label": "Taxes: Property",
+            "values": [
+                {
+                    "id": 159,
+                    "text": "11,776.24"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 160,
+            "label": "Trash Removal",
+            "values": [
+                {
+                    "id": 161,
+                    "text": "4,799.07"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 162,
+            "label": "Lawn and Snow Removal",
+            "values": [
+                {
+                    "id": 163,
+                    "text": "3,236.90"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 164,
+            "label": "Travel",
+            "values": [
+                {
+                    "id": 165,
+                    "text": "2,117.68"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 166,
+            "label": "Utilities",
+            "values": [
+                {
+                    "id": 167,
+                    "text": "69,372.66"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 168,
+            "label": "Other Income",
+            "values": [
+                {
+                    "id": 169,
+                    "text": "(364.37)"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 170,
+            "label": "City Income Taxes",
+            "values": [
+                {
+                    "id": 171,
+                    "text": "1,874.00"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 172,
+            "label": "Total Operating Expenses",
+            "values": [
+                {
+                    "id": 173,
+                    "text": "498,511.60"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 174,
+            "label": "Operating Income (Loss)",
+            "values": [
+                {
+                    "id": 175,
+                    "text": "255,439.87"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 176,
+            "label": "Other Income (Expenses)",
+            "values": [
+                {
+                    "id": 177,
+                    "text": ""
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 178,
+            "label": "Total Other Income (Expenses)",
+            "values": [
+                {
+                    "id": 179,
+                    "text": "0.00"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 180,
+            "label": "Net Income (Loss) Before Taxes",
+            "values": [
+                {
+                    "id": 181,
+                    "text": "255,439.87"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 182,
+            "label": "Net Income (Loss)",
+            "values": [
+                {
+                    "id": 183,
+                    "text": "$ 255,439.87"
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        },
+        {
+            "id": 184,
+            "label": "No Assurance",
+            "values": [
+                {
+                    "id": 185,
+                    "text": "is Provided."
+                }
+            ],
+            "merged_rows": [],
+            "depth": 0,
+            "children": []
+        }
+    ],
+    "node_count": 95,
+    "max_depth": 1
+}

@@ -9,52 +9,77 @@ import tableData from "../../../data/response_1763405559153.json";
 // Row object has keys "0", "1", "2" etc for column values
 type TableRow = Record<string, string>;
 type Table = TableRow[];
+type Period = { period: string; period_type: string };
 
 import type { EditExtractionTabProps } from "../../../types/interfaces";
 
-export function EditExtractionTab({ companyId = "company_1", files = [], onTabChange, onExportData }: EditExtractionTabProps) {
+export function EditExtractionTab({ companyId = "company_1", clientId = "client_1", files = [], onTabChange, onExportData }: EditExtractionTabProps & { clientId?: string }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedData, setEditedData] = useState<Record<string, string>>({});
   const [selectedTable, setSelectedTable] = useState(0);
-  const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedPeriodType, setSelectedPeriodType] = useState("Q");
+  const [selectedPeriod, setSelectedPeriod] = useState<string | null>(null);
+  const [availablePeriods, setAvailablePeriods] = useState<Period[]>([]);
+  const [loadingPeriods, setLoadingPeriods] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [loadedTables, setLoadedTables] = useState<Table[]>(tableData as Table[]);
 
-  // Get parsed files for selection
-  const parsedFiles = useMemo(() => {
-    return files.filter(f => f.status === "parsed" && f.date && f.period_type);
-  }, [files]);
+  // Load available periods on mount
+  useEffect(() => {
+    loadAvailablePeriods();
+  }, [companyId, clientId]);
+
+  const loadAvailablePeriods = async () => {
+    if (!companyId || !clientId) return;
+    
+    setLoadingPeriods(true);
+    try {
+      const result = await extractDataAPI.getAvailablePeriods(companyId, clientId);
+      setAvailablePeriods(result.data || []);
+      
+      // Auto-select first period if available
+      if (result.data && result.data.length > 0) {
+        const firstPeriod = result.data[0];
+        setSelectedPeriod(`${firstPeriod.period}_${firstPeriod.period_type}`);
+      }
+    } catch (err: any) {
+      console.error("Failed to load periods:", err);
+      // Don't show error if no periods exist yet
+    } finally {
+      setLoadingPeriods(false);
+    }
+  };
+
+  // Update state when period is selected
+  useEffect(() => {
+    if (selectedPeriod) {
+      const [date, periodType] = selectedPeriod.split('_');
+      setSelectedDate(date);
+      setSelectedPeriodType(periodType);
+    }
+  }, [selectedPeriod]);
+
+  const handleLoadData = async () => {
+    if (!selectedDate || !selectedPeriodType) return;
+    await handleLoadExtractionData(selectedDate, selectedPeriodType);
+  };
 
   const handleExport = () => {
     // Export the current table data
     if (loadedTables && loadedTables.length > 0) {
       const currentTable = loadedTables[selectedTable];
       onExportData?.(currentTable);
-      onTabChange?.(2); // Switch to Data Grid tab
+      onTabChange?.(2); // Switch to Hierarchy Grid tab
     }
   };
 
-  // Load extraction data when file is selected
-  useEffect(() => {
-    if (selectedFileIndex !== null && parsedFiles[selectedFileIndex]) {
-      const file = parsedFiles[selectedFileIndex];
-      if (file.extractedData?.tables) {
-        setLoadedTables(file.extractedData.tables);
-        setSelectedTable(0);
-        setEditedData({});
-      }
-    }
-  }, [selectedFileIndex, parsedFiles]);
-
-  const handleLoadExtraction = async () => {
-    if (!selectedDate || !companyId) {
-      setError("Please select a period date");
+  const handleLoadExtractionData = async (date: string, periodType: string) => {
+    if (!date || !companyId) {
       return;
     }
 
@@ -64,20 +89,47 @@ export function EditExtractionTab({ companyId = "company_1", files = [], onTabCh
     try {
       const result = await extractDataAPI.getExtractedData(
         companyId,
-        selectedDate,
-        selectedPeriodType
+        date,
+        periodType
       );
 
-      if (result.tables && result.tables.length > 0) {
+      // Transform the API response format to the expected format
+      // API returns: [ [ [ {id, row, column, text, table_id} ] ] ]
+      // Expected: [ [ { "0": "text", "1": "text", ... } ] ]
+      if (result && Array.isArray(result)) {
+        const transformedTables = result.map((table: any) => {
+          // Each table is an array of rows, each row is an array of cell objects
+          return table.map((row: any) => {
+            const transformedRow: Record<string, string> = {};
+            if (Array.isArray(row)) {
+              row.forEach((cell: any) => {
+                if (cell && typeof cell === 'object' && 'column' in cell && 'text' in cell) {
+                  transformedRow[cell.column.toString()] = cell.text;
+                }
+              });
+            }
+            return transformedRow;
+          });
+        });
+
+        if (transformedTables.length > 0) {
+          setLoadedTables(transformedTables);
+          setSelectedTable(0);
+          setEditedData({});
+        } else {
+          setError("No data found for this period");
+        }
+      } else if (result.tables && result.tables.length > 0) {
+        // Handle old format if it exists
         setLoadedTables(result.tables);
         setSelectedTable(0);
         setEditedData({});
       } else {
-        setError("No tables found in the extracted data");
+        setError("No data found for this period");
       }
     } catch (err: any) {
-      setError(err.message || "Failed to load extraction data");
-      console.error("Failed to load extraction:", err);
+      setError(err.message || "Failed to load extracted data");
+      console.error("Failed to load data:", err);
     } finally {
       setLoading(false);
     }
@@ -158,7 +210,16 @@ export function EditExtractionTab({ companyId = "company_1", files = [], onTabCh
   const getCellContent = (rowIdx: number, colIdx: string) => {
     const cellKey = `${rowIdx}-${colIdx}`;
     if (cellKey in editedData) return editedData[cellKey];
-    return currentTable[rowIdx]?.[colIdx] || "";
+    
+    const cellData = currentTable[rowIdx]?.[colIdx];
+    
+    // Handle if cellData is an object (from API response that wasn't transformed)
+    if (cellData && typeof cellData === 'object' && 'text' in cellData) {
+      return (cellData as any).text || "";
+    }
+    
+    // Handle normal string data
+    return cellData || "";
   };
 
   const handleCellEdit = (rowIdx: number, colIdx: string, value: string) => {
@@ -207,69 +268,57 @@ export function EditExtractionTab({ companyId = "company_1", files = [], onTabCh
           }
         />
         <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {/* File Selection or Manual Load */}
-          {parsedFiles.length > 0 ? (
-            <FormControl fullWidth>
-              <InputLabel>Select Parsed File</InputLabel>
-              <Select
-                value={selectedFileIndex?.toString() || ""}
-                onChange={(e) => setSelectedFileIndex(parseInt(e.target.value as string))}
-                label="Select Parsed File"
-              >
-                {parsedFiles.map((file, idx) => (
-                  <MenuItem key={idx} value={idx.toString()}>
-                    {file.name} - {file.date} ({file.period_type})
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          ) : (
-            <Alert severity="warning">
-              No parsed files available. Upload and parse documents first, or load by period date below.
-            </Alert>
-          )}
-
-          {/* Manual Load by Date */}
-          <Card sx={{ borderColor: 'primary.light', bgcolor: 'primary.50' }}>
+          {/* Period Selection Dropdown - PRIMARY SELECTOR */}
+          <Card sx={{ borderColor: 'primary.main', bgcolor: 'primary.50' }}>
             <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 2 }}>
-                <TextField
-                  label="Load by Period Date"
-                  type="date"
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  InputLabelProps={{ shrink: true }}
-                  sx={{ flex: 1, bgcolor: 'white' }}
-                />
-                <FormControl sx={{ width: 160, bgcolor: 'white' }}>
-                  <InputLabel>Period Type</InputLabel>
-                  <Select
-                    value={selectedPeriodType}
-                    onChange={(e) => setSelectedPeriodType(e.target.value)}
-                    label="Period Type"
+              <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                Select Period to View/Edit Extracted Data
+              </Typography>
+              {loadingPeriods ? (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Loader2 style={{ width: 16, height: 16 }} />
+                  <Typography variant="body2">Loading available periods...</Typography>
+                </Box>
+              ) : availablePeriods.length > 0 ? (
+                <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-end' }}>
+                  <FormControl fullWidth>
+                    <InputLabel>Period</InputLabel>
+                    <Select
+                      value={selectedPeriod || ""}
+                      onChange={(e) => setSelectedPeriod(e.target.value)}
+                      label="Period"
+                      sx={{ bgcolor: 'white' }}
+                    >
+                      {availablePeriods.map((period, idx) => (
+                        <MenuItem key={idx} value={`${period.period}_${period.period_type}`}>
+                          {`${period.period} (${period.period_type})`}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <Button
+                    variant="contained"
+                    onClick={handleLoadData}
+                    disabled={loading || !selectedPeriod}
+                    startIcon={loading ? <Loader2 style={{ width: 16, height: 16 }} /> : <RefreshCw style={{ width: 16, height: 16 }} />}
+                    sx={{ minWidth: 120, height: 56 }}
                   >
-                    <MenuItem value="Q">Quarterly</MenuItem>
-                    <MenuItem value="A">Annual</MenuItem>
-                    <MenuItem value="M">Monthly</MenuItem>
-                    <MenuItem value="YTD">YTD</MenuItem>
-                  </Select>
-                </FormControl>
-                <Button
-                  variant="contained"
-                  onClick={handleLoadExtraction}
-                  disabled={loading || !selectedDate}
-                  startIcon={loading ? <Loader2 style={{ width: 16, height: 16 }} /> : <RefreshCw style={{ width: 16, height: 16 }} />}
-                >
-                  {loading ? "Loading..." : "Load Data"}
-                </Button>
-              </Box>
-              {error && (
-                <Alert severity="error" sx={{ mt: 2 }} icon={<AlertCircle style={{ width: 16, height: 16 }} />}>
-                  {error}
+                    Load
+                  </Button>
+                </Box>
+              ) : (
+                <Alert severity="info">
+                  No periods available yet. Upload and process documents in the "Documents" tab first.
                 </Alert>
               )}
             </CardContent>
           </Card>
+
+          {error && (
+            <Alert severity="error" icon={<AlertCircle style={{ width: 16, height: 16 }} />}>
+              {error}
+            </Alert>
+          )}
 
           {/* Search and Table Selection */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -306,7 +355,7 @@ export function EditExtractionTab({ companyId = "company_1", files = [], onTabCh
         </CardContent>
       </Card>
 
-      {/* Data Grid */}
+      {/* Extracted Data Table */}
       <Card>
         <CardContent sx={{ p: 0 }}>
           <Box sx={{ maxHeight: 'calc(100vh - 400px)', overflow: 'auto' }}>

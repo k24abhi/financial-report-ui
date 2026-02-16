@@ -134,6 +134,8 @@ export interface DashboardTabsProps {
   files: UploadedFile[];
   selectedSum: number;
   companyId?: string;
+  clientId?: string;
+  getAccessToken?: () => Promise<string>;
   onToggleRow: (id: string) => void;
   onToggleCell: (cellKey: CellKey) => void;
   onClearSelection: () => void;
@@ -165,10 +167,14 @@ export interface DataGridTabProps {
   onClearSelection: () => void;
   selectedSum: number;
   onUpdateGridData: (newData: GridSection[]) => void;
+  companyId?: string;
+  clientId?: string;
+  getAccessToken?: () => Promise<string>;
 }
 
 export interface EditExtractionTabProps {
   companyId?: string;
+  clientId?: string;
   files?: UploadedFile[];
   onTabChange?: (tabIndex: number) => void;
   onExportData?: (data: any) => void;

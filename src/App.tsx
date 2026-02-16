@@ -9,6 +9,7 @@ import { DashboardTabs } from "./components/dashboard/DashboardTabs";
 import { InitializeUser } from "./components/auth/InitializeUser";
 import { AppProvider, useAppContext } from "./context/AppContext";
 import { setTokenGetter } from "./services/api";
+import { setTreeTokenGetter } from "./services/tree_service";
 import { CellKey, FinancialStatementType, GridSection, UploadedFile } from "./types";
 
 function AppContent() {
@@ -19,24 +20,13 @@ function AppContent() {
   useEffect(() => {
     if (isAuthenticated) {
       setTokenGetter(getAccessTokenSilently);
-      
-      // Log the token for testing
-      getAccessTokenSilently().then(token => {
-        console.log('='.repeat(80));
-        console.log('AUTH TOKEN FOR BACKEND TESTING:');
-        console.log('='.repeat(80));
-        console.log(token);
-        console.log('='.repeat(80));
-        console.log('Copy the token above to test your backend API');
-        console.log('='.repeat(80));
-      }).catch(err => {
-        console.error('Failed to get token:', err);
-      });
+      setTreeTokenGetter(getAccessTokenSilently);
     }
   }, [isAuthenticated, getAccessTokenSilently]);
 
   // Use context for state management
   const {
+    clientId,
     companies,
     selectedCompanyId,
     gridData,
@@ -55,13 +45,7 @@ function AppContent() {
 
   // Computed values
   const selectedCompany = useMemo(() => {
-    const company = companies.find(c => c.id === selectedCompanyId);
-    console.log('🏢 Selected Company Debug:');
-    console.log('  - selectedCompanyId:', selectedCompanyId);
-    console.log('  - companies:', companies);
-    console.log('  - found company:', company);
-    console.log('  - company.id:', company?.id);
-    return company;
+    return companies.find(c => c.id === selectedCompanyId);
   }, [selectedCompanyId, companies]);
 
   const filteredDeals = useMemo(() => {
@@ -189,8 +173,6 @@ function AppContent() {
   };
 
   const handleExportData = (exportedData: any) => {
-    console.log('📤 Exported data from Edit Extraction:', exportedData);
-    
     if (!exportedData || !Array.isArray(exportedData)) return;
 
     // Transform table data into grid format
@@ -284,8 +266,6 @@ function AppContent() {
       });
     }
 
-    console.log('📊 Transformed grid data:', transformedData);
-    
     // Update the grid data
     if (transformedData.length > 0 && selectedCompanyId) {
       updateGridData(selectedCompanyId, transformedData);
@@ -351,6 +331,8 @@ function AppContent() {
                 files={files}
                 selectedSum={selectedSum}
                 companyId={selectedCompany.id || "company_1"}
+                clientId={clientId || undefined}
+                getAccessToken={getAccessTokenSilently}
                 onToggleRow={toggleRow}
                 onToggleCell={toggleCell}
                 onClearSelection={clearCellSelection}

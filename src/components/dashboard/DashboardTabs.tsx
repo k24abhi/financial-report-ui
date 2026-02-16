@@ -18,6 +18,8 @@ export function DashboardTabs({
   files,
   selectedSum,
   companyId,
+  clientId,
+  getAccessToken,
   onToggleRow,
   onToggleCell,
   onClearSelection,
@@ -34,7 +36,7 @@ export function DashboardTabs({
       <Tabs value={activeTab} onChange={(_, newValue) => setActiveTab(newValue)} variant="scrollable" scrollButtons="auto">
         <Tab icon={<FileText style={{ width: 16, height: 16 }} />} label="Deal History" iconPosition="start" />
         <Tab icon={<TrendingUp style={{ width: 16, height: 16 }} />} label="Financial Trends" iconPosition="start" />
-        <Tab icon={<Grid3x3 style={{ width: 16, height: 16 }} />} label="Data Grid" iconPosition="start" />
+        <Tab icon={<Grid3x3 style={{ width: 16, height: 16 }} />} label="Hierarchy Grid" iconPosition="start" />
         <Tab icon={<Upload style={{ width: 16, height: 16 }} />} label="Documents" iconPosition="start" />
         <Tab icon={<FileEdit style={{ width: 16, height: 16 }} />} label="Edit Extraction" iconPosition="start" />
         <Tab icon={<Calculator style={{ width: 16, height: 16 }} />} label="Analysis" iconPosition="start" />
@@ -53,6 +55,9 @@ export function DashboardTabs({
             onClearSelection={onClearSelection}
             selectedSum={selectedSum}
             onUpdateGridData={onUpdateGridData}
+            companyId={companyId}
+            clientId={clientId}
+            getAccessToken={getAccessToken}
           />
         )}
         {activeTab === 3 && (
@@ -64,7 +69,7 @@ export function DashboardTabs({
             companyId={companyId}
           />
         )}
-        {activeTab === 4 && <EditExtractionTab companyId={companyId} files={files} onTabChange={setActiveTab} onExportData={onExportData} />}
+        {activeTab === 4 && <EditExtractionTab companyId={companyId} clientId={clientId} files={files} onTabChange={setActiveTab} onExportData={onExportData} />}
         {activeTab === 5 && <AnalysisTab gridData={gridData} />}
       </Box>
     </Box>

@@ -6,6 +6,7 @@ export const API_ENDPOINTS = {
   extractData: '/extractor/extract_data',
   getExtractedData: '/extractor/get_extracted_data',
   updateExtractedData: '/extractor/update_extracted_data',
+  extractAndStore: '/extractor/extract_and_store',
   
   // Client Details
   checkAndInit: '/client/check_and_init',
@@ -21,7 +22,32 @@ export const API_ENDPOINTS = {
   getCompanyDetails: '/client_company/get_company_details',
   updateCompanyDetails: '/client_company/update_company_details',
   
-  // Data Grid
+  // Hierarchy Grid
   fetchAllPeriodData: '/data_grid/fetch_all_period_data',
   updateGridData: '/data_grid/update_grid_data',
+  
+  // Tree Structure Management (NEW)
+  getTreeStructure: '/tree/get_tree_data',
+  createNode: '/tree/nodes',
+  updateNode: '/tree/nodes',
+  deleteNode: '/tree/nodes',
+  updateTreeStructure: '/tree/tree-structure',
+  
+  // Merge/Unmerge Operations (NEW)
+  mergeNodes: '/tree/nodes/merge',
+  unmergeNode: '/tree/nodes/unmerge',
+  
+  // Period Management (NEW)
+  addPeriodData: '/tree/periods/add',
+  getPeriods: '/tree/periods',
+  getAvailablePeriods: '/extractor/fetch_all_period_data',
+  
+  // Extracted Data (NEW)
+  getExtractedDataByPeriod: '/tree/extracted-data',
+  storeExtractedData: '/tree/extracted-data',
+  
+  // State Management (NEW)
+  saveTreeState: '/tree/state/save',
+  getTreeStates: '/tree/state/history',
 };
+
