@@ -18,7 +18,7 @@ import {
   InputLabel,
 } from '@mui/material';
 import { Upload as UploadIcon, CalendarToday } from '@mui/icons-material';
-import { treeDataService } from '../../services/tree_service';
+import { extractDataAPI } from '../../services/api';
 
 export interface PeriodManagementProps {
   companyId: string;
@@ -91,14 +91,16 @@ export function PeriodManagement({ companyId, clientId, onPeriodAdded }: PeriodM
     try {
       const period = generatePeriod();
       
-      const response = await treeDataService.extractAndStore(
-        selectedFile,
-        companyId,
-        clientId,
-        period
-      );
+      // Extract data from PDF
+      await extractDataAPI.extractData({
+        file: selectedFile,
+        company_id: companyId,
+        date: period,
+        period_type: periodType,
+        extract_again: false,
+      });
 
-      setSuccess(`Successfully added ${period} data. Created ${response.nodes_created} new nodes.`);
+      setSuccess(`Successfully extracted ${period} data. Refresh the tree to see new nodes.`);
       
       // Close dialog after short delay
       setTimeout(() => {

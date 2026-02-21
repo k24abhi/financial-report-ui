@@ -19,14 +19,19 @@ import {
   Merge as MergeIcon,
   CallSplit as UnmergeIcon,
   Refresh,
+  Delete as DeleteIcon,
+  CheckBox,
+  CheckBoxOutlineBlank,
 } from '@mui/icons-material';
 import {
   treeDataService,
   TreeNode,
+  TreeNodeValue,
   setTreeTokenGetter,
   flattenTree,
   getMergeCount,
   isMergedNode,
+  getConstituentNodeIds,
 } from '../../services/tree_service';
 import PartialUnmergeDialog from './PartialUnmergeDialog.tsx';
 
@@ -99,6 +104,9 @@ interface TreeNodeItemProps {
   dragMode: 'merge' | 'reorganize';
   selectedCells: CellSelection[];
   onCellSelect: (nodeId: number, valueId: number, value: string) => void;
+  deleteMode?: boolean;
+  isSelectedForDeletion?: boolean;
+  onToggleSelection?: (nodeId: string) => void;
 }
 
 function TreeNodeItem({
@@ -112,6 +120,9 @@ function TreeNodeItem({
   dragMode,
   selectedCells,
   onCellSelect,
+  deleteMode = false,
+  isSelectedForDeletion = false,
+  onToggleSelection,
 }: TreeNodeItemProps) {
   const [dropZone, setDropZone] = useState<'merge' | 'child' | 'before' | 'after' | null>(null);
 
@@ -119,6 +130,7 @@ function TreeNodeItem({
     () => ({
       type: ItemType,
       item: { node },
+      canDrag: () => !deleteMode,
       collect: (monitor) => ({
         opacity: monitor.isDragging() ? 0.5 : 1,
       }),
@@ -128,12 +140,13 @@ function TreeNodeItem({
         }
       },
     }),
-    [node]
+    [node, deleteMode]
   );
 
   const [{ isOver }, drop] = useDrop(
     () => ({
       accept: ItemType,
+      canDrop: () => !deleteMode,
       drop: (item, monitor) => {
         const position = dropZone || (dragMode === 'merge' ? 'merge' : 'child');
         onDrop(node, position);
@@ -189,18 +202,37 @@ function TreeNodeItem({
           alignItems: 'center',
           py: 0.5,
           px: 1,
-          cursor: 'move',
+          cursor: deleteMode ? 'pointer' : 'move',
           opacity,
-          backgroundColor: isOver && canDrop ? (dragMode === 'merge' ? 'warning.light' : 'info.light') : 'transparent',
-          borderLeft: dragMode === 'merge' && isOver && canDrop ? '3px solid' : 'none',
-          borderColor: 'primary.main',
-          border: dragMode === 'reorganize' && isOver && canDrop ? '2px dashed' : 'none',
-          borderColor: 'info.main',
+          backgroundColor: isSelectedForDeletion ? 'error.light' : (isOver && canDrop ? (dragMode === 'merge' ? 'warning.light' : 'info.light') : 'transparent'),
+          ...(dragMode === 'merge' && isOver && canDrop && {
+            borderLeft: '3px solid',
+            borderColor: 'primary.main',
+          }),
+          ...(dragMode === 'reorganize' && isOver && canDrop && {
+            border: '2px dashed',
+            borderColor: 'info.main',
+          }),
           '&:hover': {
-            backgroundColor: 'action.hover',
+            backgroundColor: deleteMode ? (isSelectedForDeletion ? 'error.light' : 'error.lighter') : 'action.hover',
           },
         }}
+        onClick={() => deleteMode && onToggleSelection && onToggleSelection(String(node.id))}
       >
+        {/* Delete mode checkbox */}
+        {deleteMode && (
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleSelection && onToggleSelection(String(node.id));
+            }}
+            sx={{ mr: 1 }}
+          >
+            {isSelectedForDeletion ? <CheckBox color="error" /> : <CheckBoxOutlineBlank />}
+          </IconButton>
+        )}
+
         {/* Expand/Collapse Icon with indentation */}
         <Box sx={{ display: 'flex', alignItems: 'center', minWidth: 40 + node.level * 24, pl: node.level * 3 }}>
           {hasChildren ? (
@@ -273,6 +305,8 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
   const [dropPosition, setDropPosition] = useState<'merge' | 'child' | 'before' | 'after'>('merge');
   const [dragMode, setDragMode] = useState<'merge' | 'reorganize'>('merge');
   const [selectedCells, setSelectedCells] = useState<CellSelection[]>([]);
+  const [deleteMode, setDeleteMode] = useState(false);
+  const [selectedNodesForDeletion, setSelectedNodesForDeletion] = useState<Set<string>>(new Set());
   
   // Partial unmerge dialog state
   const [unmergeDialog, setUnmergeDialog] = useState<{
@@ -297,8 +331,7 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
     try {
       const response = await treeDataService.getTreeStructure(
         companyId,
-        clientId,
-        false
+        clientId
       );
       // Use roots from the new response format
       setTreeData(response.roots || response.data?.tree || []);
@@ -395,12 +428,11 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
       setLoading(true);
       setError(null);
 
-      await treeDataService.mergeNodes({
-        source_node_id: String(draggedNode.id),
-        target_node_id: String(dropTargetNode.id),
-        company_id: companyId,
-        client_id: clientId,
-      });
+      await treeDataService.mergeNodes(
+        clientId,
+        companyId,
+        [String(draggedNode.id), String(dropTargetNode.id)]
+      );
 
       // Reload tree structure
       await loadTreeStructure();
@@ -457,11 +489,11 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
       setError(null);
 
       // First call without selected_ids to check if partial unmerge is needed
-      const response = await treeDataService.unmergeNode({
-        node_id: String(node.id),
-        company_id: companyId,
-        client_id: clientId,
-      });
+      const response = await treeDataService.unmergeNode(
+        clientId,
+        companyId,
+        [String(node.id)]
+      );
 
       if (response.status === 'partial_unmerge_required' && response.constituent_nodes) {
         // Show dialog for partial unmerge
@@ -490,12 +522,11 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
       setLoading(true);
       setError(null);
 
-      await treeDataService.unmergeNode({
-        node_id: String(unmergeDialog.node.id),
-        company_id: companyId,
-        client_id: clientId,
-        selected_ids: selectedIds,
-      });
+      await treeDataService.unmergeNode(
+        clientId,
+        companyId,
+        [String(unmergeDialog.node.id), ...selectedIds]
+      );
 
       // Close dialog and reload tree
       setUnmergeDialog({ open: false, node: null, constituentNodes: [] });
@@ -508,8 +539,65 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
     }
   };
 
-  // Flatten tree for rendering
-  const flattenedTree = flattenTree(treeData);
+  // Toggle delete mode
+  const toggleDeleteMode = () => {
+    setDeleteMode(!deleteMode);
+    setSelectedNodesForDeletion(new Set());
+    // Clear drag states when entering delete mode
+    if (!deleteMode) {
+      setDraggedNode(null);
+      setDropTargetNode(null);
+    }
+  };
+
+  // Toggle node selection for deletion
+  const toggleNodeSelection = (nodeId: string) => {
+    setSelectedNodesForDeletion((prev) => {
+      const next = new Set(prev);
+      if (next.has(nodeId)) {
+        next.delete(nodeId);
+      } else {
+        next.add(nodeId);
+      }
+      return next;
+    });
+  };
+
+  // Handle delete operation
+  const handleDelete = async () => {
+    if (selectedNodesForDeletion.size === 0) return;
+
+    const confirmed = window.confirm(
+      `Are you sure you want to delete ${selectedNodesForDeletion.size} node(s)? This action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      await treeDataService.deleteNodes(
+        clientId,
+        companyId,
+        Array.from(selectedNodesForDeletion)
+      );
+
+      // Clear selection and reload tree
+      setSelectedNodesForDeletion(new Set());
+      setDeleteMode(false);
+      await loadTreeStructure();
+    } catch (err: any) {
+      console.error('❌ Delete failed:', err);
+      setError(err.message || 'Failed to delete nodes');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Flatten tree for rendering, excluding constituent nodes that were merged into another node
+  const constituentIds = getConstituentNodeIds(treeData);
+  const flattenedTree = flattenTree(treeData, 0, constituentIds);
 
   // Filter to show only expanded branches
   const visibleNodes = flattenedTree.filter((node) => {
@@ -538,7 +626,7 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
             <Typography variant="h6">Financial Data Tree Structure</Typography>
             <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
               {/* Cell Selection Info */}
-              {selectedCells.length > 0 && (
+              {selectedCells.length > 0 && !deleteMode && (
                 <Chip
                   label={`${selectedCells.length} cell${selectedCells.length > 1 ? 's' : ''} selected`}
                   color="success"
@@ -547,16 +635,41 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
                 />
               )}
 
-              {/* Mode Toggle */}
+              {/* Delete Mode Toggle */}
               <Chip
-                label={dragMode === 'merge' ? 'Merge Mode' : 'Reorganize Mode'}
-                color={dragMode === 'merge' ? 'warning' : 'info'}
-                onClick={() => setDragMode(dragMode === 'merge' ? 'reorganize' : 'merge')}
+                label={deleteMode ? 'Delete Mode' : 'Edit Mode'}
+                color={deleteMode ? 'error' : 'default'}
+                onClick={toggleDeleteMode}
                 clickable
+                icon={deleteMode ? <DeleteIcon /> : undefined}
                 sx={{ cursor: 'pointer' }}
               />
+
+              {/* Delete Nodes Button */}
+              {deleteMode && selectedNodesForDeletion.size > 0 && (
+                <Button
+                  variant="contained"
+                  color="error"
+                  startIcon={<DeleteIcon />}
+                  onClick={handleDelete}
+                  disabled={loading}
+                >
+                  Delete {selectedNodesForDeletion.size} Node{selectedNodesForDeletion.size > 1 ? 's' : ''}
+                </Button>
+              )}
+
+              {/* Mode Toggle (only show when not in delete mode) */}
+              {!deleteMode && (
+                <Chip
+                  label={dragMode === 'merge' ? 'Merge Mode' : 'Reorganize Mode'}
+                  color={dragMode === 'merge' ? 'warning' : 'info'}
+                  onClick={() => setDragMode(dragMode === 'merge' ? 'reorganize' : 'merge')}
+                  clickable
+                  sx={{ cursor: 'pointer' }}
+                />
+              )}
               
-              {draggedNode && dropTargetNode && dragMode === 'merge' && (
+              {draggedNode && dropTargetNode && dragMode === 'merge' && !deleteMode && (
                 <Button
                   variant="contained"
                   color="primary"
@@ -569,7 +682,7 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
                 </Button>
               )}
               
-              {draggedNode && dropTargetNode && dragMode === 'reorganize' && (
+              {draggedNode && dropTargetNode && dragMode === 'reorganize' && !deleteMode && (
                 <Button
                   variant="contained"
                   color="info"
@@ -668,8 +781,11 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
                     dragMode={dragMode}
                     selectedCells={selectedCells}
                     onCellSelect={handleCellSelect}
+                    deleteMode={deleteMode}
+                    isSelectedForDeletion={selectedNodesForDeletion.has(String(node.id))}
+                    onToggleSelection={toggleNodeSelection}
                   />
-                  {isMergedNode(node) && (
+                  {isMergedNode(node) && !deleteMode && (
                     <Tooltip title="Unmerge this node">
                       <IconButton
                         size="small"

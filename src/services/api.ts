@@ -1,5 +1,10 @@
 import { API_BASE_URL, API_ENDPOINTS } from '../config/api';
-import type { ExtractDataParams, ExtractedData, ClientDetails, CompanyDetails } from '../types/interfaces';
+import type {
+  ExtractDataParams,
+  ExtractedData,
+  ClientDetails,
+  CompanyDetails,
+} from '../types/interfaces';
 
 // Token getter function - to be set by the app
 let getTokenFunction: (() => Promise<string>) | null = null;
@@ -117,45 +122,25 @@ export const extractDataAPI = {
     );
   },
 
-  // Get available periods for a company
-  async getAvailablePeriods(
-    company_id: string,
-    client_id: string
-  ): Promise<{ status: string; data: Array<{period: string, period_type: string}> }> {
-    const queryParams = new URLSearchParams({
-      company_id,
-      client_id,
-    });
+  // Get available periods for a company.
+  // Transforms the backend col_period_mapping into a flat { period, period_type }[]
+  async getAvailablePeriods(company_id: string): Promise<{ data: { period: string; period_type: string }[] }> {
+    const queryParams = new URLSearchParams({ company_id });
+    const raw = await apiCall<{
+      status: string;
+      data: { col_period_mapping: Record<string, { date: string; period_type: string }> };
+    }>(`${API_ENDPOINTS.fetchAllPeriodData}?${queryParams}`, { method: 'GET' });
 
-    return apiCall(
-      `${API_ENDPOINTS.getAvailablePeriods}?${queryParams}`,
-      {
-        method: 'GET',
-      }
-    );
-  },
+    const mapping = raw?.data?.col_period_mapping ?? {};
+    // Sort column keys numerically (col "1" is earliest) to keep chronological order
+    const periods = Object.keys(mapping)
+      .sort((a, b) => Number(a) - Number(b))
+      .map((key) => ({
+        period: mapping[key].date,
+        period_type: mapping[key].period_type,
+      }));
 
-  // Get extracted data for a specific period
-  async getExtractedDataByPeriod(
-    company_id: string,
-    client_id: string,
-    period?: string
-  ): Promise<any> {
-    const queryParams = new URLSearchParams({
-      company_id,
-      client_id,
-    });
-    
-    if (period) {
-      queryParams.append('period', period);
-    }
-
-    return apiCall(
-      `${API_ENDPOINTS.getExtractedDataByPeriod}?${queryParams}`,
-      {
-        method: 'GET',
-      }
-    );
+    return { data: periods };
   },
 };
 
@@ -170,26 +155,18 @@ export const clientAPI = {
       body: JSON.stringify(details),
     });
   },
-
-  async getAllClients() {
-    return apiCall(API_ENDPOINTS.getAllClients, {
-      method: 'GET',
-    });
-  },
 };
 
 // Company Services
 export const companyAPI = {
-  async getClientCompanies(client_id: string) {
-    const queryParams = new URLSearchParams({ client_id });
-    return apiCall(`${API_ENDPOINTS.getClientCompanies}?${queryParams}`, {
+  async getClientCompanies() {
+    return apiCall(API_ENDPOINTS.getClientCompanies, {
       method: 'GET',
     });
   },
 
-  async addClientCompany(client_id: string, companyData: Omit<CompanyDetails, 'client_id'>) {
-    const queryParams = new URLSearchParams({ client_id });
-    return apiCall(`${API_ENDPOINTS.addClientCompany}?${queryParams}`, {
+  async addClientCompany(companyData: Omit<CompanyDetails, 'client_id'>) {
+    return apiCall(API_ENDPOINTS.addClientCompany, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -198,19 +175,18 @@ export const companyAPI = {
     });
   },
 
-  async getCompanyDetails(client_id: string, company_id: string) {
-    const queryParams = new URLSearchParams({ client_id, company_id });
+  async getCompanyDetails(company_id: string) {
+    const queryParams = new URLSearchParams({ company_id });
     return apiCall(`${API_ENDPOINTS.getCompanyDetails}?${queryParams}`, {
       method: 'GET',
     });
   },
 
   async updateCompanyDetails(
-    client_id: string,
     company_id: string,
     companyData: Omit<CompanyDetails, 'client_id'>
   ) {
-    const queryParams = new URLSearchParams({ client_id, company_id });
+    const queryParams = new URLSearchParams({ company_id });
     return apiCall(`${API_ENDPOINTS.updateCompanyDetails}?${queryParams}`, {
       method: 'PUT',
       headers: {
@@ -219,25 +195,212 @@ export const companyAPI = {
       body: JSON.stringify(companyData),
     });
   },
+
+  async removeClientCompany(company_id: string) {
+    const queryParams = new URLSearchParams({ company_id });
+    return apiCall(`${API_ENDPOINTS.removeClientCompany}?${queryParams}`, {
+      method: 'DELETE',
+    });
+  },
 };
 
-// Hierarchy Grid Services
+// Hierarchy Grid Services – returns the raw col_period_mapping from the backend.
+// Use this to understand which periods have been uploaded for a company.
 export const dataGridAPI = {
-  async fetchAllPeriodData(client_id: string, company_id: string) {
-    const queryParams = new URLSearchParams({ client_id, company_id });
+  async fetchAllPeriodData(company_id: string): Promise<{
+    status: string;
+    data: { col_period_mapping: Record<string, { date: string; period_type: string }> };
+  }> {
+    const queryParams = new URLSearchParams({ company_id });
     return apiCall(`${API_ENDPOINTS.fetchAllPeriodData}?${queryParams}`, {
       method: 'GET',
     });
   },
+};
 
-  async updateGridData(client_id: string, company_id: string, payload: any) {
-    const queryParams = new URLSearchParams({ client_id, company_id });
-    return apiCall(`${API_ENDPOINTS.updateGridData}?${queryParams}`, {
+// ─── Reports & Exports ──────────────────────────────────────────────────────
+
+export interface ExportRequest {
+  company_id: string;
+  format: 'xlsx' | 'pdf';
+  periods: string[];
+  tree_nodes: { label: string; depth: number; values: number[] }[];
+  company_name: string;
+}
+
+export interface ExportResponse {
+  download_url: string;
+  format: string;
+  expires_in_seconds: number;
+}
+
+export const reportsAPI = {
+  async exportFinancialStatement(payload: ExportRequest): Promise<ExportResponse> {
+    return apiCall<ExportResponse>(API_ENDPOINTS.exportFinancialStatement, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
+  },
+};
+
+// ─── Underwriting Calculations ────────────────────────────────────────────────
+
+export interface CalculationRequest {
+  company_id: string;
+  period: string;
+  node_values: Record<string, number>;
+  loan_amount?: number;
+  appraised_value?: number;
+  annual_debt_service?: number;
+  depreciation?: number;
+  total_rooms?: number;
+  avg_daily_rate?: number;
+  cap_rate_override?: number | null;
+}
+
+export interface MetricResult {
+  name: string;
+  value: number | null;
+  formula: string;
+  inputs: Record<string, number>;
+  explanation: string;
+  passed_threshold?: boolean | null;
+  threshold?: number | null;
+}
+
+export interface CalculationResponse {
+  company_id: string;
+  period: string;
+  dscr: MetricResult;
+  noi: MetricResult;
+  ltv: MetricResult;
+  cap_rate: MetricResult;
+  break_even_occupancy: MetricResult;
+  gross_revenue: number;
+  total_expenses: number;
+  net_income: number;
+}
+
+export const calculationsAPI = {
+  async previewCalculations(payload: CalculationRequest): Promise<CalculationResponse> {
+    return apiCall<CalculationResponse>(API_ENDPOINTS.previewCalculations, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  },
+};
+
+// ─── Collaboration ────────────────────────────────────────────────────────────
+
+export interface InviteCollaboratorPayload {
+  company_id: string;
+  invitee_email: string;
+  role?: 'viewer' | 'editor';
+}
+
+export interface CollaboratorRecord {
+  collaborator_id: string;
+  user_id: string;
+  email: string;
+  role: string;
+  invited_by: string;
+  invited_at: string;
+}
+
+export interface AddCommentPayload {
+  company_id: string;
+  node_id: string;
+  comment_text: string;
+}
+
+export interface CommentRecord {
+  comment_id: string;
+  node_id: string;
+  user_id: string;
+  comment_text: string;
+  created_at: string;
+}
+
+export const collaborationAPI = {
+  async inviteCollaborator(
+    payload: InviteCollaboratorPayload
+  ): Promise<{ message: string; collaborator_id: string; invitee_email: string }> {
+    return apiCall(API_ENDPOINTS.inviteCollaborator, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async listCollaborators(company_id: string): Promise<{ collaborators: CollaboratorRecord[] }> {
+    const queryParams = new URLSearchParams({ company_id });
+    return apiCall(`${API_ENDPOINTS.listCollaborators}?${queryParams}`, { method: 'GET' });
+  },
+
+  async removeCollaborator(company_id: string, collaborator_id: string): Promise<{ status: string }> {
+    const queryParams = new URLSearchParams({ company_id, collaborator_id });
+    return apiCall(`${API_ENDPOINTS.removeCollaborator}?${queryParams}`, { method: 'DELETE' });
+  },
+
+  async addComment(payload: AddCommentPayload): Promise<CommentRecord> {
+    return apiCall(API_ENDPOINTS.addComment, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async listComments(company_id: string, node_id?: string): Promise<{ comments: CommentRecord[] }> {
+    const queryParams = new URLSearchParams({ company_id });
+    if (node_id) queryParams.set('node_id', node_id);
+    return apiCall(`${API_ENDPOINTS.listComments}?${queryParams}`, { method: 'GET' });
+  },
+};
+
+// ─── Deal Approvals ────────────────────────────────────────────────────────────
+
+export interface DealRecord {
+  deal_id: string;
+  company_id: string;
+  status: string;
+  prepared_by: string;
+  reviewed_by?: string | null;
+  decision_by?: string | null;
+  submitted_at?: string | null;
+  decided_at?: string | null;
+  notes?: string | null;
+  comments?: string | null;
+  history: Record<string, string>[];
+}
+
+export const approvalsAPI = {
+  async submitForReview(params: {
+    company_id: string;
+    deal_id: string;
+    notes?: string;
+  }): Promise<DealRecord> {
+    return apiCall<DealRecord>(API_ENDPOINTS.submitForReview, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+  },
+
+  async decideDeal(params: {
+    deal_id: string;
+    decision: 'approve' | 'reject';
+    comments?: string;
+  }): Promise<DealRecord> {
+    return apiCall<DealRecord>(API_ENDPOINTS.decideDeal, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+  },
+
+  async getDeal(deal_id: string): Promise<DealRecord> {
+    return apiCall<DealRecord>(`${API_ENDPOINTS.getDeal}/${deal_id}`, { method: 'GET' });
   },
 };

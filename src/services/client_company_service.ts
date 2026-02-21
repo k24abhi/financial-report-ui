@@ -26,7 +26,6 @@ export const clientCompanyService = {
     const res = await fetch(`${API_BASE_URL}${API_ENDPOINTS.getClientCompanies}`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-    console.log(accessToken, res)
     if (!res.ok) throw new Error('Failed to fetch client companies');
     const data = await res.json();
     return data?.company_ids ?? [];
@@ -76,20 +75,12 @@ export const clientCompanyService = {
   },
 
   async removeClientCompany(accessToken: string, companyId: CompanyId): Promise<void> {
-    // Try query string first
     const url = `${API_BASE_URL}${API_ENDPOINTS.removeClientCompany}?company_id=${companyId}`;
-    const res = await fetch(url, { method: 'DELETE', headers: { Authorization: `Bearer ${accessToken}` } });
-    if (res.ok) return;
-    // Fallback: send JSON body
-    const res2 = await fetch(`${API_BASE_URL}${API_ENDPOINTS.removeClientCompany}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ company_id: companyId }),
+    const res = await fetch(url, { 
+      method: 'DELETE', 
+      headers: { Authorization: `Bearer ${accessToken}` } 
     });
-    if (!res2.ok) throw new Error('Failed to remove client company');
+    if (!res.ok) throw new Error('Failed to remove client company');
   },
 
   async updateCompanyDetails(accessToken: string, companyId: CompanyId, payload: Partial<NewCompanyForm>): Promise<Company> {
@@ -99,7 +90,7 @@ export const clientCompanyService = {
       address: payload.location,
       industry: payload.industry
     };
-    
+
     const url = `${API_BASE_URL}${API_ENDPOINTS.updateCompanyDetails}?company_id=${companyId}`;
     const res = await fetch(url, {
       method: 'PUT',
@@ -110,8 +101,7 @@ export const clientCompanyService = {
       body: JSON.stringify(apiPayload),
     });
     if (!res.ok) throw new Error('Failed to update company');
-    const data = await res.json();
-    const detail = data?.company ?? data;
-    return toCompany(detail);
+    // Backend returns { status, message } – re-fetch the full company record
+    return await this.getCompanyDetails(accessToken, companyId);
   },
 };

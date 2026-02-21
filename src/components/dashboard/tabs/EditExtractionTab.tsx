@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, TextField, Button, Chip, Box, Typography
 import { Search, Edit2, Download, Upload, Loader2, AlertCircle, RefreshCw, CheckCircle2 } from "lucide-react";
 import { extractDataAPI } from "../../../services/api";
 import { UploadedFile } from "../../../types";
-import tableData from "../../../data/response_1763405559153.json";
 
 // New data structure: array of tables, each table is array of row objects
 // Row object has keys "0", "1", "2" etc for column values
@@ -27,7 +26,7 @@ export function EditExtractionTab({ companyId = "company_1", clientId = "client_
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const [loadedTables, setLoadedTables] = useState<Table[]>(tableData as Table[]);
+  const [loadedTables, setLoadedTables] = useState<Table[]>([]);
 
   // Load available periods on mount
   useEffect(() => {
@@ -39,7 +38,7 @@ export function EditExtractionTab({ companyId = "company_1", clientId = "client_
     
     setLoadingPeriods(true);
     try {
-      const result = await extractDataAPI.getAvailablePeriods(companyId, clientId);
+      const result = await extractDataAPI.getAvailablePeriods(companyId);
       setAvailablePeriods(result.data || []);
       
       // Auto-select first period if available

@@ -2,8 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { useAuth0 } from '@auth0/auth0-react';
 import { clientCompanyService, CompanyId } from '../services/client_company_service';
 import { authService } from '../services/auth_service';
-import { dataGridAPI } from '../services/api';
-import type { Company, GridSection, UploadedFile } from '../types';
+import type { Company, GridSection, UploadedFile, FinancialStatementType } from '../types';
 
 interface AppContextType {
   // Client Data
@@ -30,6 +29,7 @@ interface AppContextType {
   addFiles: (newFiles: UploadedFile[]) => void;
   removeFile: (index: number) => void;
   updateFileStatus: (index: number, status: string, extractedData?: any) => void;
+  updateFileStatementType: (index: number, statementType: FinancialStatementType) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -164,46 +164,51 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   }, [isAuthenticated, getAccessTokenSilently]);
 
   const loadGridData = useCallback(async (companyId: string) => {
-    if (!isAuthenticated || !clientId) return;
-    
+    if (!isAuthenticated) return;
+
     setIsLoadingGrid(true);
     try {
-      const response: any = await dataGridAPI.fetchAllPeriodData(clientId, companyId);
-      
-      if (response.status === 'success' && response.data) {
-        // Transform API response to GridSection format if needed
-        const gridSections = transformGridData(response.data);
-        setGridData(gridSections);
-      } else {
-        setGridData([]);
-      }
+      // fetchAllPeriodData returns period metadata (col_period_mapping), not row data.
+      // Actual financial rows are managed by TreeView via the tree structure API.
+      // Grid data populated here is only used for the simplified tabular view;
+      // it is populated via onExportData when a user exports from EditExtractionTab.
+      setGridData([]);
     } catch (error) {
       console.error('Failed to load grid data:', error);
       setGridData([]);
     } finally {
       setIsLoadingGrid(false);
     }
-  }, [isAuthenticated, clientId]);
+  }, [isAuthenticated]);
 
   const updateGridData = useCallback(async (companyId: string, data: GridSection[]) => {
-    if (!isAuthenticated || !clientId) return;
+    if (!isAuthenticated) return;
     
     try {
       // Update local state immediately
       setGridData(data);
       
-      // Transform and send to API
-      const payload = transformGridDataForAPI(data);
-      await dataGridAPI.updateGridData(clientId, companyId, payload);
+      // Note: There's no updateGridData endpoint in the backend
+      // Data updates should be done through extractData or updateExtractedData
+      console.log('Grid data updated locally. Use extractData API to sync with backend.');
     } catch (error) {
       console.error('Failed to update grid data:', error);
       // Optionally reload data on error
       await loadGridData(companyId);
     }
-  }, [isAuthenticated, clientId, loadGridData]);
+  }, [isAuthenticated, loadGridData]);
 
   const addFiles = useCallback((newFiles: UploadedFile[]) => {
-    setFiles(prev => [...newFiles, ...prev]);
+    setFiles(prev => {
+      const prevKeys = new Set(prev.map(f => `${f.name}|${f.size}`));
+      const hasOverlap = newFiles.some(f => prevKeys.has(`${f.name}|${f.size}`));
+      if (hasOverlap) {
+        // Called as a full replacement (e.g. UploadTab mutating an existing entry's status)
+        return newFiles;
+      }
+      // Genuinely new files – prepend so newest appears at the top
+      return [...newFiles, ...prev];
+    });
   }, []);
 
   const removeFile = useCallback((index: number) => {
@@ -211,8 +216,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   }, []);
 
   const updateFileStatus = useCallback((index: number, status: string, extractedData?: any) => {
-    setFiles(prev => prev.map((file, i) => 
+    setFiles(prev => prev.map((file, i) =>
       i === index ? { ...file, status, extractedData } : file
+    ));
+  }, []);
+
+  const updateFileStatementType = useCallback((index: number, statementType: FinancialStatementType) => {
+    setFiles(prev => prev.map((file, i) =>
+      i === index ? { ...file, statementType } : file
     ));
   }, []);
 
@@ -234,6 +245,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     addFiles,
     removeFile,
     updateFileStatus,
+    updateFileStatementType,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

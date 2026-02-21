@@ -6,48 +6,46 @@ export const API_ENDPOINTS = {
   extractData: '/extractor/extract_data',
   getExtractedData: '/extractor/get_extracted_data',
   updateExtractedData: '/extractor/update_extracted_data',
-  extractAndStore: '/extractor/extract_and_store',
-  
+  fetchAllPeriodData: '/extractor/fetch_all_period_data',
+
   // Client Details
   checkAndInit: '/client/check_and_init',
   getClientProfile: '/client/get_client_profile',
   updateClientDetails: '/client/update_client_details',
   addNewClient: '/client/add_new_client',
-  getAllClients: '/client/get_all_clients',
-  
-  // Client Company
+
+  // Client Company (auth-based, no client_id param needed)
   getClientCompanies: '/client_company/get_client_companies',
   addClientCompany: '/client_company/add_client_company',
   removeClientCompany: '/client_company/remove_client_company',
   getCompanyDetails: '/client_company/get_company_details',
   updateCompanyDetails: '/client_company/update_company_details',
-  
-  // Hierarchy Grid
-  fetchAllPeriodData: '/data_grid/fetch_all_period_data',
-  updateGridData: '/data_grid/update_grid_data',
-  
-  // Tree Structure Management (NEW)
-  getTreeStructure: '/tree/get_tree_data',
-  createNode: '/tree/nodes',
-  updateNode: '/tree/nodes',
-  deleteNode: '/tree/nodes',
-  updateTreeStructure: '/tree/tree-structure',
-  
-  // Merge/Unmerge Operations (NEW)
-  mergeNodes: '/tree/nodes/merge',
-  unmergeNode: '/tree/nodes/unmerge',
-  
-  // Period Management (NEW)
-  addPeriodData: '/tree/periods/add',
-  getPeriods: '/tree/periods',
-  getAvailablePeriods: '/extractor/fetch_all_period_data',
-  
-  // Extracted Data (NEW)
-  getExtractedDataByPeriod: '/tree/extracted-data',
-  storeExtractedData: '/tree/extracted-data',
-  
-  // State Management (NEW)
-  saveTreeState: '/tree/state/save',
-  getTreeStates: '/tree/state/history',
+
+  // Tree Structure Management
+  getTreeData: '/tree/get_tree_data',
+  mergeUnmergeNodes: '/tree/merge_unmerge_nodes',
+  deleteTreeNodes: '/tree/delete_tree_nodes',
+  getAllPeriods: '/tree/get_all_periods',
+
+  // Reports & Exports
+  exportFinancialStatement: '/reports/export_financial_statement',
+
+  // Underwriting Calculations
+  previewCalculations: '/calculations/preview',
+
+  // Collaboration
+  inviteCollaborator: '/collaboration/invite',
+  listCollaborators: '/collaboration/collaborators',
+  removeCollaborator: '/collaboration/collaborators',
+  addComment: '/collaboration/comments',
+  listComments: '/collaboration/comments',
+
+  // Deal Approvals
+  submitForReview: '/approvals/submit_for_review',
+  decideDeal: '/approvals/decide',
+  getDeal: '/approvals',
+
+  // Health
+  health: '/health',
 };
 

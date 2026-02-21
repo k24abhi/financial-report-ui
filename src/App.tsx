@@ -36,6 +36,7 @@ function AppContent() {
     updateGridData,
     addFiles,
     removeFile,
+    updateFileStatementType,
   } = useAppContext();
   
   // Local UI state
@@ -160,8 +161,7 @@ function AppContent() {
   };
 
   const handleUpdateFileStatementType = (idx: number, statementType: FinancialStatementType) => {
-    // This is handled locally, no need to update context for this simple change
-    // The files state is managed in context but this just updates the UI
+    updateFileStatementType(idx, statementType);
   };
 
   const handleUpdateGridData = (newData: GridSection[]) => {

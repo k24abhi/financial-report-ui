@@ -153,93 +153,50 @@ export const treeDataService = {
    */
   async getTreeStructure(
     companyId: string,
-    clientId: string,
-    includeExtractedData: boolean = false
+    clientId?: string // Optional for backward compatibility, not used
   ): Promise<TreeStructureResponse> {
     const queryParams = new URLSearchParams({
       company_id: companyId,
-      client_id: clientId,
-      include_extracted_data: includeExtractedData.toString(),
     });
 
     try {
       const response = await treeApiCall<TreeStructureResponse>(
-        `${API_ENDPOINTS.getTreeStructure}?${queryParams}`,
+        `${API_ENDPOINTS.getTreeData}?${queryParams}`,
         { method: 'GET' }
       );
       return response;
     } catch (error) {
-      // Fallback to mock data if API fails (for development)
-      console.log('Using mock tree data');
+      // Only fall back to mock data during local development so production errors surface clearly
+      const isDev = (import.meta as any).env?.DEV === true;
+      if (isDev) {
+        console.warn('Tree API failed – using mock data for development:', error);
+        return mockTreeData as TreeStructureResponse;
+      }
+      throw error;
       return mockTreeData as TreeStructureResponse;
     }
   },
 
   /**
-   * Create a new node in the tree
+   * Merge nodes together
+   * @param nodeIds - Array of node IDs to merge
    */
-  async createNode(request: CreateNodeRequest): Promise<{ status: string; node_id: string }> {
-    return treeApiCall(
-      API_ENDPOINTS.createNode,
-      {
-        method: 'POST',
-        body: JSON.stringify(request),
-      }
-    );
-  },
-
-  /**
-   * Update an existing node
-   */
-  async updateNode(
-    nodeId: string,
+  async mergeNodes(
+    clientId: string, // Deprecated, kept for backward compatibility
     companyId: string,
-    updates: Partial<{ label: string; metadata: Record<string, any> }>
-  ): Promise<{ status: string; message: string }> {
-    return treeApiCall(
-      API_ENDPOINTS.updateNode,
-      {
-        method: 'PUT',
-        body: JSON.stringify({
-          node_id: nodeId,
-          company_id: companyId,
-          ...updates,
-        }),
-      }
-    );
-  },
-
-  /**
-   * Delete a node from the tree
-   */
-  async deleteNode(
-    nodeId: string,
-    companyId: string
-  ): Promise<{ status: string; message: string }> {
-    const queryParams = new URLSearchParams({
-      node_id: nodeId,
-      company_id: companyId,
-    });
-
-    return treeApiCall(
-      `${API_ENDPOINTS.deleteNode}?${queryParams}`,
-      { method: 'DELETE' }
-    );
-  },
-
-  /**
-   * Merge two nodes together
-   * Source node + Target node → Merged node
-   * The merged node will have merged_rows field containing both node IDs
-   */
-  async mergeNodes(request: MergeNodesRequest): Promise<MergeNodesResponse> {
-    console.log('🔄 Merging nodes:', request);
+    nodeIds: string[]
+  ): Promise<MergeNodesResponse> {
+    console.log('🔄 Merging nodes:', nodeIds);
     
     const response = await treeApiCall<MergeNodesResponse>(
-      API_ENDPOINTS.mergeNodes,
+      API_ENDPOINTS.mergeUnmergeNodes,
       {
         method: 'POST',
-        body: JSON.stringify(request),
+        body: JSON.stringify({
+          company_id: companyId,
+          action: 'merge',
+          node_ids: nodeIds,
+        }),
       }
     );
 
@@ -248,19 +205,25 @@ export const treeDataService = {
   },
 
   /**
-   * Unmerge a node
-   * Two-step process for partial unmerge:
-   * 1. Call without selected_ids to get constituent_nodes options
-   * 2. Call with selected_ids to perform the unmerge
+   * Unmerge nodes
+   * @param nodeIds - Array of node IDs to unmerge
    */
-  async unmergeNode(request: UnmergeNodeRequest): Promise<UnmergeNodeResponse> {
-    console.log('🔄 Unmerging node:', request);
+  async unmergeNode(
+    clientId: string, // Deprecated, kept for backward compatibility
+    companyId: string,
+    nodeIds: string[]
+  ): Promise<UnmergeNodeResponse> {
+    console.log('🔄 Unmerging nodes:', nodeIds);
     
     const response = await treeApiCall<UnmergeNodeResponse>(
-      API_ENDPOINTS.unmergeNode,
+      API_ENDPOINTS.mergeUnmergeNodes,
       {
         method: 'POST',
-        body: JSON.stringify(request),
+        body: JSON.stringify({
+          company_id: companyId,
+          action: 'unmerge',
+          node_ids: nodeIds,
+        }),
       }
     );
 
@@ -269,90 +232,40 @@ export const treeDataService = {
   },
 
   /**
-   * Add period data to the tree
-   * Creates new nodes as children to matching parent nodes
+   * Delete nodes from the tree
    */
-  async addPeriodData(request: AddPeriodDataRequest): Promise<AddPeriodDataResponse> {
-    console.log('📅 Adding period data:', request.period);
-    
-    const response = await treeApiCall<AddPeriodDataResponse>(
-      API_ENDPOINTS.addPeriodData,
-      {
-        method: 'POST',
-        body: JSON.stringify(request),
-      }
-    );
-
-    console.log('✅ Period data added:', response);
-    return response;
-  },
-
-  /**
-   * Save current tree state as a snapshot
-   */
-  async saveTreeState(request: SaveTreeStateRequest): Promise<{ status: string; state_id: string }> {
-    return treeApiCall(
-      API_ENDPOINTS.saveTreeState,
-      {
-        method: 'POST',
-        body: JSON.stringify(request),
-      }
-    );
-  },
-
-  /**
-   * Get tree state history
-   */
-  async getTreeStates(
+  async deleteNodes(
+    clientId: string, // Deprecated, kept for backward compatibility
     companyId: string,
-    clientId: string
-  ): Promise<{ status: string; states: any[] }> {
+    nodeIds: string[]
+  ): Promise<{ status: string; message: string }> {
+    return treeApiCall(
+      API_ENDPOINTS.deleteTreeNodes,
+      { 
+        method: 'DELETE',
+        body: JSON.stringify({
+          company_id: companyId,
+          node_ids: nodeIds,
+        }),
+      }
+    );
+  },
+
+  /**
+   * Get all available periods for a company
+   */
+  async getAllPeriods(
+    clientId: string, // Deprecated, kept for backward compatibility
+    companyId: string
+  ): Promise<{ periods: string[] }> {
     const queryParams = new URLSearchParams({
       company_id: companyId,
-      client_id: clientId,
     });
 
     return treeApiCall(
-      `${API_ENDPOINTS.getTreeStates}?${queryParams}`,
+      `${API_ENDPOINTS.getAllPeriods}?${queryParams}`,
       { method: 'GET' }
     );
-  },
-
-  /**
-   * Extract and store PDF data, creating nodes automatically
-   */
-  async extractAndStore(
-    file: File,
-    companyId: string,
-    clientId: string,
-    period: string
-  ): Promise<{ status: string; message: string; nodes_created: number }> {
-    // Get token
-    let token: string | null = null;
-    if (getTokenFunction) {
-      token = await getTokenFunction();
-    }
-
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('company_id', companyId);
-    formData.append('client_id', clientId);
-    formData.append('period', period);
-
-    const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.extractAndStore}`, {
-      method: 'POST',
-      headers: {
-        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-      },
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || errorData.detail || 'Failed to extract and store data');
-    }
-
-    return await response.json();
   },
 };
 
