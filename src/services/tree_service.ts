@@ -60,12 +60,12 @@ export interface TreeNode {
   values: TreeNodeValue[];
   merged_rows: any[];
   depth: number;
+  order?: number;  // 0-based sibling position; absent in legacy records (treated as 0)
   children: TreeNode[];
   // Legacy fields for backward compatibility
   tree_id?: string;
   node_id?: string;
   hierarchy_level?: number;
-  order?: number;
   extracted_data_ids?: string[];
   metadata?: Record<string, any>;
 }
@@ -90,9 +90,7 @@ export interface MergeNodesRequest {
   client_id: string;
 }
 
-export interface MergeNodesResponse {
-  status: string;
-  message: string;
+export interface MergeNodesResponse extends TreeStructureResponse {
   merged_node_id: string;
 }
 
@@ -185,8 +183,7 @@ export const treeDataService = {
     clientId: string, // Deprecated, kept for backward compatibility
     companyId: string,
     nodeIds: string[]
-  ): Promise<MergeNodesResponse> {
-    console.log('🔄 Merging nodes:', nodeIds);
+  ): Promise<MergeNodesResponse> {    console.log('🔄 Merging nodes:', nodeIds);
     
     const response = await treeApiCall<MergeNodesResponse>(
       API_ENDPOINTS.mergeUnmergeNodes,
@@ -252,6 +249,38 @@ export const treeDataService = {
   },
 
   /**
+   * Reorganize a node by moving it in the tree
+   * @param companyId - Company ID
+   * @param nodeId - ID of the node to move
+   * @param newParentId - ID of the new parent (for 'child' position), or null for root
+   * @param position - 'child' | 'before' | 'after'
+   * @param referenceNodeId - Required for 'before'/'after': position relative to this node
+   */
+  async reorganizeNode(
+    companyId: string,
+    nodeId: string,
+    newParentId: string | null,
+    position: 'child' | 'before' | 'after' = 'child',
+    referenceNodeId?: string,
+  ): Promise<TreeStructureResponse> {
+    const response = await treeApiCall<TreeStructureResponse>(
+      API_ENDPOINTS.reorganizeNode,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          company_id: companyId,
+          node_id: nodeId,
+          new_parent_id: newParentId,
+          position,
+          reference_node_id: referenceNodeId ?? null,
+        }),
+      }
+    );
+
+    return response;
+  },
+
+  /**
    * Get all available periods for a company
    */
   async getAllPeriods(
@@ -269,14 +298,60 @@ export const treeDataService = {
   },
 };
 
+/**
+ * Collect the IDs of all nodes that have been merged into another node.
+ * Merged constituent nodes are stored in `merged_rows` of the resulting node.
+ * They should remain in the DB but must not appear as standalone rows in the UI.
+ */
+export function getConstituentNodeIds(nodes: TreeNode[]): Set<string> {
+  const constituentIds = new Set<string>();
+
+  function traverse(nodes: TreeNode[]): void {
+    for (const node of nodes) {
+      if (node.merged_rows && node.merged_rows.length > 0) {
+        for (const row of node.merged_rows) {
+          if (row !== null && row !== undefined) {
+            if (typeof row === 'number') {
+              constituentIds.add(String(row));
+            } else if (typeof row === 'string') {
+              constituentIds.add(row);
+            } else if (typeof row === 'object') {
+              if (row.id !== undefined && row.id !== null) {
+                constituentIds.add(String(row.id));
+              } else if (row.node_id !== undefined && row.node_id !== null) {
+                constituentIds.add(String(row.node_id));
+              }
+            }
+          }
+        }
+      }
+      if (node.children && node.children.length > 0) {
+        traverse(node.children);
+      }
+    }
+  }
+
+  traverse(nodes);
+  return constituentIds;
+}
+
 // Helper function to flatten tree for display
-export function flattenTree(nodes: TreeNode[], level: number = 0): Array<TreeNode & { level: number }> {
+// Pass `constituentIds` (from getConstituentNodeIds) to hide merged-source nodes.
+export function flattenTree(
+  nodes: TreeNode[],
+  level: number = 0,
+  constituentIds: Set<string> = new Set()
+): Array<TreeNode & { level: number }> {
   const result: Array<TreeNode & { level: number }> = [];
   
   for (const node of nodes) {
+    // Skip nodes that have already been merged into another node
+    if (constituentIds.has(String(node.id)) || (node.node_id && constituentIds.has(node.node_id))) {
+      continue;
+    }
     result.push({ ...node, level });
     if (node.children && node.children.length > 0) {
-      result.push(...flattenTree(node.children, level + 1));
+      result.push(...flattenTree(node.children, level + 1, constituentIds));
     }
   }
   

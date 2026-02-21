@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import {
@@ -28,7 +28,6 @@ import {
   TreeNode,
   TreeNodeValue,
   setTreeTokenGetter,
-  flattenTree,
   getMergeCount,
   isMergedNode,
   getConstituentNodeIds,
@@ -97,8 +96,7 @@ interface TreeNodeItemProps {
   node: TreeNode & { level: number };
   isExpanded: boolean;
   onToggle: (nodeId: string) => void;
-  onDragStart: (node: TreeNode) => void;
-  onDrop: (targetNode: TreeNode, position: 'merge' | 'child' | 'before' | 'after') => void;
+  onDrop: (sourceNode: TreeNode, targetNode: TreeNode, position: 'merge' | 'child' | 'before' | 'after') => void;
   isDragging: boolean;
   canDrop: boolean;
   dragMode: 'merge' | 'reorganize';
@@ -113,7 +111,6 @@ function TreeNodeItem({
   node,
   isExpanded,
   onToggle,
-  onDragStart,
   onDrop,
   isDragging,
   canDrop,
@@ -124,7 +121,14 @@ function TreeNodeItem({
   isSelectedForDeletion = false,
   onToggleSelection,
 }: TreeNodeItemProps) {
-  const [dropZone, setDropZone] = useState<'merge' | 'child' | 'before' | 'after' | null>(null);
+  // Use refs for callbacks to avoid stale closures in useDrag / useDrop
+  const onDropRef = useRef(onDrop);
+  useEffect(() => { onDropRef.current = onDrop; }, [onDrop]);
+
+  // Tracks which sub-zone of this node is being hovered ('before' | 'child' | 'after')
+  const [hoverZone, setHoverZone] = useState<'before' | 'after' | 'child' | null>(null);
+  // Keep a ref to the DOM element for bounding-rect measurement during hover
+  const elementRef = useRef<HTMLDivElement | null>(null);
 
   const [{ opacity }, drag] = useDrag(
     () => ({
@@ -134,11 +138,6 @@ function TreeNodeItem({
       collect: (monitor) => ({
         opacity: monitor.isDragging() ? 0.5 : 1,
       }),
-      end: (item, monitor) => {
-        if (monitor.didDrop()) {
-          onDragStart(node);
-        }
-      },
     }),
     [node, deleteMode]
   );
@@ -147,40 +146,58 @@ function TreeNodeItem({
     () => ({
       accept: ItemType,
       canDrop: () => !deleteMode,
-      drop: (item, monitor) => {
-        const position = dropZone || (dragMode === 'merge' ? 'merge' : 'child');
-        onDrop(node, position);
+      drop: (item: { node: TreeNode }, _monitor) => {
+        const zone = dragMode === 'merge' ? 'merge' : (hoverZone || 'child');
+        onDropRef.current(item.node, node, zone as 'merge' | 'child' | 'before' | 'after');
       },
-      hover: (item, monitor) => {
-        if (dragMode === 'reorganize' && monitor.isOver({ shallow: true })) {
-          const clientOffset = monitor.getClientOffset();
-          if (clientOffset) {
-            const hoverBoundingRect = (monitor.getTargetMonitor() as any)?.targetId;
-            // Simple position detection based on hover area
-            setDropZone('child');
-          }
-        }
+      hover: (_item, monitor) => {
+        if (!monitor.isOver({ shallow: true })) return;
+        if (dragMode !== 'reorganize') return;
+        const el = elementRef.current;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const clientOffset = monitor.getClientOffset();
+        if (!clientOffset) return;
+        const relY = clientOffset.y - rect.top;
+        if (relY < rect.height * 0.28) setHoverZone('before');
+        else if (relY > rect.height * 0.72) setHoverZone('after');
+        else setHoverZone('child');
       },
       collect: (monitor) => ({
         isOver: monitor.isOver(),
       }),
     }),
-    [node, dragMode, dropZone]
+    [node, dragMode, deleteMode, hoverZone]
   );
 
-  // Combine drag and drop refs
-  const dragDropRef = (el: HTMLDivElement | null) => {
-    drag(el);
-    drop(el);
-  };
+  // Clear hover zone when cursor leaves
+  useEffect(() => {
+    if (!isOver) setHoverZone(null);
+  }, [isOver]);
+
+  // Stable combined ref — only recreated when drag/drop handlers change
+  const dragDropRef = useCallback(
+    (el: HTMLDivElement | null) => {
+      drag(el);
+      drop(el);
+      elementRef.current = el;
+    },
+    [drag, drop]
+  );
 
   const hasChildren = node.children && node.children.length > 0;
   const mergeCount = getMergeCount(node);
 
+  const isDropActive = isOver && canDrop && !deleteMode;
+  const isBeforeZone  = isDropActive && dragMode === 'reorganize' && hoverZone === 'before';
+  const isAfterZone   = isDropActive && dragMode === 'reorganize' && hoverZone === 'after';
+  const isChildZone   = isDropActive && dragMode === 'reorganize' && hoverZone === 'child';
+  const isMergeZone   = isDropActive && dragMode === 'merge';
+
   return (
     <Box sx={{ position: 'relative' }}>
-      {/* Drop zone indicator for before */}
-      {dragMode === 'reorganize' && canDrop && isOver && (
+      {/* "Before" indicator — thick line + pill label above the row */}
+      {isBeforeZone && (
         <Box
           sx={{
             position: 'absolute',
@@ -188,11 +205,71 @@ function TreeNodeItem({
             left: 0,
             right: 0,
             height: 4,
-            backgroundColor: 'primary.main',
-            zIndex: 1000,
-            opacity: 0.7,
+            bgcolor: 'info.main',
+            zIndex: 1100,
+            borderRadius: 1,
+            boxShadow: '0 0 6px 1px rgba(2,136,209,0.5)',
           }}
-        />
+        >
+          <Box
+            sx={{
+              position: 'absolute',
+              left: 12,
+              top: -10,
+              bgcolor: 'info.main',
+              color: 'white',
+              fontSize: '0.65rem',
+              fontWeight: 700,
+              px: 0.75,
+              py: 0.15,
+              borderRadius: 1,
+              lineHeight: 1.4,
+              letterSpacing: 0.3,
+              pointerEvents: 'none',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            ↑ INSERT BEFORE
+          </Box>
+        </Box>
+      )}
+
+      {/* "After" indicator — thick line + pill label below the row */}
+      {isAfterZone && (
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: -2,
+            left: 0,
+            right: 0,
+            height: 4,
+            bgcolor: 'info.main',
+            zIndex: 1100,
+            borderRadius: 1,
+            boxShadow: '0 0 6px 1px rgba(2,136,209,0.5)',
+          }}
+        >
+          <Box
+            sx={{
+              position: 'absolute',
+              left: 12,
+              bottom: -10,
+              bgcolor: 'info.main',
+              color: 'white',
+              fontSize: '0.65rem',
+              fontWeight: 700,
+              px: 0.75,
+              py: 0.15,
+              borderRadius: 1,
+              lineHeight: 1.4,
+              letterSpacing: 0.3,
+              pointerEvents: 'none',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            ↓ INSERT AFTER
+          </Box>
+        </Box>
       )}
 
       <Box
@@ -204,17 +281,33 @@ function TreeNodeItem({
           px: 1,
           cursor: deleteMode ? 'pointer' : 'move',
           opacity,
-          backgroundColor: isSelectedForDeletion ? 'error.light' : (isOver && canDrop ? (dragMode === 'merge' ? 'warning.light' : 'info.light') : 'transparent'),
-          ...(dragMode === 'merge' && isOver && canDrop && {
-            borderLeft: '3px solid',
-            borderColor: 'primary.main',
-          }),
-          ...(dragMode === 'reorganize' && isOver && canDrop && {
-            border: '2px dashed',
+          position: 'relative',
+          // Child zone: highlighted background + left accent border
+          ...(isChildZone && {
+            backgroundColor: 'rgba(2,136,209,0.12)',
+            borderLeft: '4px solid',
             borderColor: 'info.main',
+            borderRadius: '0 4px 4px 0',
+            boxShadow: 'inset 0 0 0 1px rgba(2,136,209,0.3)',
+          }),
+          // Merge zone: amber background + left accent border
+          ...(isMergeZone && {
+            backgroundColor: 'rgba(237,108,2,0.12)',
+            borderLeft: '4px solid',
+            borderColor: 'warning.main',
+            borderRadius: '0 4px 4px 0',
+            boxShadow: 'inset 0 0 0 1px rgba(237,108,2,0.3)',
+          }),
+          // Normal hover / delete states (only when no active drop zone)
+          ...(!isChildZone && !isMergeZone && {
+            backgroundColor: isSelectedForDeletion ? 'error.light' : 'transparent',
           }),
           '&:hover': {
-            backgroundColor: deleteMode ? (isSelectedForDeletion ? 'error.light' : 'error.lighter') : 'action.hover',
+            backgroundColor: isChildZone || isMergeZone
+              ? undefined
+              : deleteMode
+                ? (isSelectedForDeletion ? 'error.light' : 'error.lighter')
+                : 'action.hover',
           },
         }}
         onClick={() => deleteMode && onToggleSelection && onToggleSelection(String(node.id))}
@@ -284,6 +377,29 @@ function TreeNodeItem({
             sx={{ ml: 1, minWidth: 32 }}
           />
         )}
+
+        {/* Drop zone label pill (child / merge) */}
+        {(isChildZone || isMergeZone) && (
+          <Box
+            sx={{
+              ml: 'auto',
+              mr: 1,
+              px: 1,
+              py: 0.25,
+              borderRadius: 1,
+              fontSize: '0.65rem',
+              fontWeight: 700,
+              letterSpacing: 0.3,
+              lineHeight: 1.4,
+              whiteSpace: 'nowrap',
+              pointerEvents: 'none',
+              color: 'white',
+              bgcolor: isChildZone ? 'info.main' : 'warning.main',
+            }}
+          >
+            {isChildZone ? '→ MOVE AS CHILD' : '⇌ MERGE'}
+          </Box>
+        )}
       </Box>
     </Box>
   );
@@ -295,10 +411,148 @@ export interface TreeViewProps {
   getAccessToken: () => Promise<string>;
 }
 
+// ── Pending operation types ───────────────────────────────────────────────────
+type PendingMerge = { type: 'merge'; nodeIds: string[]; tempMergedId: number };
+type PendingReorganize = {
+  type: 'reorganize';
+  nodeId: string;
+  referenceNodeId: string;
+  position: 'child' | 'before' | 'after';
+};
+type PendingOp = PendingMerge | PendingReorganize;
+
+// ── Local tree mutation helpers ───────────────────────────────────────────────
+/** Collect all node IDs for initialising the expanded set */
+function getAllNodeIds(nodes: TreeNode[]): Set<string> {
+  const ids = new Set<string>();
+  const traverse = (ns: TreeNode[]) => {
+    for (const n of ns) {
+      ids.add(String(n.id));
+      traverse(n.children || []);
+    }
+  };
+  traverse(nodes);
+  return ids;
+}
+
+/** Apply a merge locally — removes source nodes, inserts combined temp node */
+function applyLocalMerge(roots: TreeNode[], nodeIds: number[], tempId: number): TreeNode[] {
+  const idSet = new Set(nodeIds);
+  const collected: TreeNode[] = [];
+  const collect = (ns: TreeNode[]) => {
+    for (const n of ns) {
+      if (idSet.has(n.id)) collected.push(n);
+      collect(n.children || []);
+    }
+  };
+  collect(roots);
+  if (collected.length < 2) return roots;
+
+  const merged: TreeNode = {
+    id: tempId,
+    label: collected.map(n => n.label).join(' + '),
+    values: collected.flatMap(n => n.values || []),
+    merged_rows: nodeIds,
+    depth: collected[0].depth,
+    order: collected[0].order ?? 0,    children: collected.flatMap(n => n.children || []),
+  };
+
+  let inserted = false;
+  const process = (ns: TreeNode[]): TreeNode[] =>
+    ns.reduce<TreeNode[]>((acc, n) => {
+      if (idSet.has(n.id)) {
+        if (!inserted) { acc.push(merged); inserted = true; }
+      } else {
+        acc.push({ ...n, children: process(n.children || []) });
+      }
+      return acc;
+    }, []);
+
+  return process(roots);
+}
+
+/**
+ * Apply a reorganize locally — handles 'child', 'before', 'after' positions.
+ * - 'child'  : append as last child of referenceId
+ * - 'before' : insert as sibling immediately before referenceId
+ * - 'after'  : insert as sibling immediately after referenceId
+ */
+function applyLocalReorganize(
+  roots: TreeNode[],
+  nodeId: number,
+  referenceId: number,
+  position: 'child' | 'before' | 'after'
+): TreeNode[] {
+  let moved: TreeNode | null = null;
+
+  // Step 1: remove the node from its current location
+  const remove = (ns: TreeNode[]): TreeNode[] =>
+    ns.reduce<TreeNode[]>((acc, n) => {
+      if (n.id === nodeId) { moved = n; }
+      else { acc.push({ ...n, children: remove(n.children || []) }); }
+      return acc;
+    }, []);
+
+  const withoutMoved = remove(roots);
+  if (!moved) return roots;
+  const movedNode = moved;
+
+  if (position === 'child') {
+    // Append as last child of referenceId
+    const insertAsChild = (ns: TreeNode[]): TreeNode[] =>
+      ns.map(n =>
+        n.id === referenceId
+          ? { ...n, children: [...(n.children || []), movedNode] }
+          : { ...n, children: insertAsChild(n.children || []) }
+      );
+    return insertAsChild(withoutMoved);
+  }
+
+  // 'before' or 'after' — insert as sibling relative to referenceId
+  const insertAsSibling = (ns: TreeNode[]): TreeNode[] => {
+    const refIdx = ns.findIndex(n => n.id === referenceId);
+    if (refIdx !== -1) {
+      const insertAt = position === 'before' ? refIdx : refIdx + 1;
+      const result = [...ns];
+      result.splice(insertAt, 0, movedNode);
+      return result;
+    }
+    return ns.map(n => ({ ...n, children: insertAsSibling(n.children || []) }));
+  };
+
+  return insertAsSibling(withoutMoved);
+}
+
+/** Recursively build visible nodes, respecting expandedNodes */
+function buildVisibleNodes(
+  nodes: TreeNode[],
+  expandedSet: Set<string>,
+  constituentIds: Set<string>,
+  level = 0
+): Array<TreeNode & { level: number }> {
+  const result: Array<TreeNode & { level: number }> = [];
+  for (const node of nodes) {
+    if (constituentIds.has(String(node.id))) continue;
+    result.push({ ...node, level });
+    if (expandedSet.has(String(node.id)) && node.children?.length) {
+      result.push(...buildVisibleNodes(node.children, expandedSet, constituentIds, level + 1));
+    }
+  }
+  return result;
+}
+
 export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps) {
-  const [treeData, setTreeData] = useState<TreeNode[]>([]);
+  // serverTreeData = last-known state from the server (used for discard)
+  const [serverTreeData, setServerTreeData] = useState<TreeNode[]>([]);
+  // localTreeData = server state + pending local changes (what the UI renders)
+  const [localTreeData, setLocalTreeData] = useState<TreeNode[]>([]);
+  // Accumulated pending operations — sent to API only on "Save Changes"
+  const [pendingOps, setPendingOps] = useState<PendingOp[]>([]);
+  const nextTempId = useRef(-1); // negative IDs for locally-merged temp nodes
+
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [draggedNode, setDraggedNode] = useState<TreeNode | null>(null);
   const [dropTargetNode, setDropTargetNode] = useState<TreeNode | null>(null);
@@ -329,12 +583,13 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
     setLoading(true);
     setError(null);
     try {
-      const response = await treeDataService.getTreeStructure(
-        companyId,
-        clientId
-      );
-      // Use roots from the new response format
-      setTreeData(response.roots || response.data?.tree || []);
+      const response = await treeDataService.getTreeStructure(companyId, clientId);
+      const roots = response.roots || response.data?.tree || [];
+      setServerTreeData(roots);
+      setLocalTreeData(roots);
+      setPendingOps([]);
+      // Expand all nodes by default
+      setExpandedNodes(getAllNodeIds(roots));
     } catch (err: any) {
       setError(err.message || 'Failed to load tree structure');
     } finally {
@@ -414,67 +669,80 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
     return validations;
   };
 
-  // Handle merge operation
-  const handleMerge = async () => {
+  // Handle merge operation — applied locally, queued for bulk save
+  const handleMerge = () => {
     if (!draggedNode || !dropTargetNode) return;
-
-    // Prevent merging a node with itself
     if (draggedNode.id === dropTargetNode.id) {
       setError('Cannot merge a node with itself');
       return;
     }
 
+    const tempId = nextTempId.current--;
+    const nodeIds = [String(draggedNode.id), String(dropTargetNode.id)];
+    setLocalTreeData(prev => applyLocalMerge(prev, [draggedNode.id, dropTargetNode.id], tempId));
+    // Expand the temp merged node so its children are visible
+    setExpandedNodes(prev => new Set([...prev, String(tempId)]));
+    setPendingOps(prev => [...prev, { type: 'merge', nodeIds, tempMergedId: tempId }]);
+    setDraggedNode(null);
+    setDropTargetNode(null);
+  };
+
+  // Apply a reorganize immediately (called directly from drop in reorganize mode)
+  const applyReorganize = (sourceNode: TreeNode, targetNode: TreeNode, position: 'child' | 'before' | 'after') => {
+    if (sourceNode.id === targetNode.id) return;
+    setLocalTreeData(prev => applyLocalReorganize(prev, sourceNode.id, targetNode.id, position));
+    setPendingOps(prev => [
+      ...prev,
+      { type: 'reorganize', nodeId: String(sourceNode.id), referenceNodeId: String(targetNode.id), position },
+    ]);
+  };
+
+  // Save all pending changes to the API sequentially
+  const handleSaveChanges = async () => {
+    if (pendingOps.length === 0) return;
+    setSaving(true);
+    setError(null);
+
+    // Maps temp (negative) IDs → real IDs returned by the API
+    const idMap = new Map<string, string>();
+    const resolve = (id: string) => idMap.get(id) ?? id;
+
     try {
-      setLoading(true);
-      setError(null);
-
-      await treeDataService.mergeNodes(
-        clientId,
-        companyId,
-        [String(draggedNode.id), String(dropTargetNode.id)]
-      );
-
-      // Reload tree structure
+      for (const op of pendingOps) {
+        if (op.type === 'merge') {
+          const resolvedIds = op.nodeIds.map(resolve);
+          const response = await treeDataService.mergeNodes(clientId, companyId, resolvedIds);
+          if (response.merged_node_id) {
+            idMap.set(String(op.tempMergedId), response.merged_node_id);
+          }
+        } else {
+          const resolvedNodeId = resolve(op.nodeId);
+          const resolvedRefId = resolve(op.referenceNodeId);
+          const newParentId = op.position === 'child' ? resolvedRefId : null;
+          await treeDataService.reorganizeNode(
+            companyId,
+            resolvedNodeId,
+            newParentId,
+            op.position,
+            resolvedRefId,
+          );
+        }
+      }
+      // Reload fresh tree from server
       await loadTreeStructure();
-
-      // Clear drag state
-      setDraggedNode(null);
-      setDropTargetNode(null);
     } catch (err: any) {
-      setError(err.message || 'Failed to merge nodes');
+      setError(err.message || 'Failed to save changes');
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
-  // Handle reorganize operation
-  const handleReorganize = async () => {
-    if (!draggedNode || !dropTargetNode) return;
-
-    if (draggedNode.id === dropTargetNode.id) {
-      setError('Cannot move a node to itself');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      // TODO: Implement API call for reorganizing nodes
-      // This would move draggedNode as a child/sibling of dropTargetNode
-      console.log(`Reorganize: Move node ${draggedNode.id} as ${dropPosition} of ${dropTargetNode.id}`);
-
-      // Reload tree structure
-      await loadTreeStructure();
-
-      // Clear drag state
-      setDraggedNode(null);
-      setDropTargetNode(null);
-    } catch (err: any) {
-      setError(err.message || 'Failed to reorganize nodes');
-    } finally {
-      setLoading(false);
-    }
+  // Discard all pending changes and revert to server state
+  const handleDiscardChanges = () => {
+    setLocalTreeData(serverTreeData);
+    setPendingOps([]);
+    setDraggedNode(null);
+    setDropTargetNode(null);
   };
 
   // Handle unmerge operation (first call)
@@ -595,22 +863,11 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
     }
   };
 
-  // Flatten tree for rendering, excluding constituent nodes that were merged into another node
-  const constituentIds = getConstituentNodeIds(treeData);
-  const flattenedTree = flattenTree(treeData, 0, constituentIds);
+  // Compute visible nodes respecting collapsed/expanded state
+  const constituentIds = getConstituentNodeIds(localTreeData);
+  const visibleNodes = buildVisibleNodes(localTreeData, expandedNodes, constituentIds);
 
-  // Filter to show only expanded branches
-  const visibleNodes = flattenedTree.filter((node) => {
-    if (node.level === 0) return true;
-    // Check if all parents are expanded
-    let currentLevel = node.level - 1;
-    const parentPath: string[] = [];
-    
-    // This is a simplified check - in production, you'd need proper parent tracking
-    return true; // For now, show all nodes
-  });
-
-  if (loading && treeData.length === 0) {
+  if (loading && localTreeData.length === 0) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
         <CircularProgress />
@@ -624,15 +881,43 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
         <CardContent>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
             <Typography variant="h6">Financial Data Tree Structure</Typography>
-            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
               {/* Cell Selection Info */}
               {selectedCells.length > 0 && !deleteMode && (
                 <Chip
                   label={`${selectedCells.length} cell${selectedCells.length > 1 ? 's' : ''} selected`}
                   color="success"
                   onDelete={() => setSelectedCells([])}
-                  sx={{ mr: 1 }}
                 />
+              )}
+
+              {/* Pending changes badge */}
+              {pendingOps.length > 0 && (
+                <>
+                  <Chip
+                    label={`${pendingOps.length} unsaved change${pendingOps.length > 1 ? 's' : ''}`}
+                    color="warning"
+                    variant="outlined"
+                  />
+                  <Button
+                    variant="contained"
+                    color="success"
+                    onClick={handleSaveChanges}
+                    disabled={saving || loading}
+                    size="small"
+                  >
+                    {saving ? 'Saving…' : 'Save Changes'}
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="warning"
+                    onClick={handleDiscardChanges}
+                    disabled={saving || loading}
+                    size="small"
+                  >
+                    Discard
+                  </Button>
+                </>
               )}
 
               {/* Delete Mode Toggle */}
@@ -675,26 +960,14 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
                   color="primary"
                   startIcon={<MergeIcon />}
                   onClick={handleMerge}
-                  sx={{ mr: 1 }}
-                  disabled={loading}
                 >
                   Merge Nodes
                 </Button>
               )}
               
-              {draggedNode && dropTargetNode && dragMode === 'reorganize' && !deleteMode && (
-                <Button
-                  variant="contained"
-                  color="info"
-                  onClick={handleReorganize}
-                  sx={{ mr: 1 }}
-                  disabled={loading}
-                >
-                  Move as {dropPosition === 'child' ? 'Child' : dropPosition === 'before' ? 'Before' : 'After'}
-                </Button>
-              )}
+
               
-              <IconButton onClick={loadTreeStructure} disabled={loading}>
+              <IconButton onClick={loadTreeStructure} disabled={loading || saving}>
                 <Refresh />
               </IconButton>
             </Box>
@@ -743,19 +1016,10 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
             </Card>
           )}
 
-          {draggedNode && dropTargetNode && (
+          {draggedNode && dropTargetNode && dragMode === 'merge' && (
             <Alert severity="info" sx={{ mb: 2 }}>
-              {dragMode === 'merge' ? (
-                <>
-                  Drag <strong>{draggedNode.label}</strong> onto <strong>{dropTargetNode.label}</strong> to merge. 
-                  Click "Merge Nodes" to confirm.
-                </>
-              ) : (
-                <>
-                  Move <strong>{draggedNode.label}</strong> as {dropPosition} of <strong>{dropTargetNode.label}</strong>.
-                  Click button to confirm.
-                </>
-              )}
+              Drag <strong>{draggedNode.label}</strong> onto <strong>{dropTargetNode.label}</strong> to merge.
+              Click "Merge Nodes" to confirm.
             </Alert>
           )}
 
@@ -771,10 +1035,17 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
                     node={node}
                     isExpanded={expandedNodes.has(String(node.id))}
                     onToggle={toggleNode}
-                    onDragStart={setDraggedNode}
-                    onDrop={(targetNode, position) => {
-                      setDropTargetNode(targetNode);
-                      setDropPosition(position);
+                    onDrop={(sourceNode, targetNode, position) => {
+                      if (dragMode === 'merge') {
+                        if (sourceNode.id !== targetNode.id) {
+                          setDraggedNode(sourceNode);
+                          setDropTargetNode(targetNode);
+                          setDropPosition('merge');
+                        }
+                      } else {
+                        const pos = (position === 'merge' ? 'child' : position) as 'child' | 'before' | 'after';
+                        applyReorganize(sourceNode, targetNode, pos);
+                      }
                     }}
                     isDragging={draggedNode?.id === node.id}
                     canDrop={draggedNode !== null && draggedNode.id !== node.id}
@@ -807,7 +1078,7 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
             )}
           </Box>
 
-          {loading && (
+          {(loading || saving) && (
             <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
               <CircularProgress size={24} />
             </Box>

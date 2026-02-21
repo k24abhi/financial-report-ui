@@ -25,6 +25,7 @@ export const API_ENDPOINTS = {
   getTreeData: '/tree/get_tree_data',
   mergeUnmergeNodes: '/tree/merge_unmerge_nodes',
   deleteTreeNodes: '/tree/delete_tree_nodes',
+  reorganizeNode: '/tree/reorganize_node',
   getAllPeriods: '/tree/get_all_periods',
 
   // Reports & Exports
