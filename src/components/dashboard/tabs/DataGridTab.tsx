@@ -5,7 +5,6 @@ import { formatUSD } from "../../../utils/formatters";
 import { GridSection, CellKey, GridRow } from "../../../types";
 import type { DataGridTabProps } from "../../../types/interfaces";
 import { TreeView } from "../../tree/TreeView";
-import { PeriodManagement } from "../../tree/PeriodManagement";
 
 export function DataGridTab({
   gridData,
@@ -20,12 +19,6 @@ export function DataGridTab({
   clientId,
   getAccessToken
 }: DataGridTabProps) {
-  const [treeRefreshKey, setTreeRefreshKey] = useState(0);
-  const handlePeriodAdded = () => {
-    // Trigger tree refresh by changing key
-    setTreeRefreshKey((prev) => prev + 1);
-  };
-
   const [mergeMode, setMergeMode] = useState(false);
   const [childMode, setChildMode] = useState(false);
   const [draggedRow, setDraggedRow] = useState<{row: GridRow, sectionId: string} | null>(null);
@@ -250,16 +243,8 @@ export function DataGridTab({
       {/* Tree View Section */}
       {companyId && clientId && getAccessToken ? (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          {/* Period Management */}
-          <PeriodManagement
-            companyId={companyId}
-            clientId={clientId}
-            onPeriodAdded={handlePeriodAdded}
-          />
-
           {/* Tree Structure */}
           <TreeView
-            key={treeRefreshKey}
             companyId={companyId}
             clientId={clientId}
             getAccessToken={getAccessToken}
