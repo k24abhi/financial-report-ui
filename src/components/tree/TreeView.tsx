@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import {
@@ -105,6 +105,8 @@ interface TreeNodeItemProps {
   deleteMode?: boolean;
   isSelectedForDeletion?: boolean;
   onToggleSelection?: (nodeId: string) => void;
+  /** Ordered period columns — when present, values are aligned by period. */
+  periods?: { period: string; periodType: string }[];
 }
 
 function TreeNodeItem({
@@ -120,6 +122,7 @@ function TreeNodeItem({
   deleteMode = false,
   isSelectedForDeletion = false,
   onToggleSelection,
+  periods = [],
 }: TreeNodeItemProps) {
   // Use refs for callbacks to avoid stale closures in useDrag / useDrop
   const onDropRef = useRef(onDrop);
@@ -346,8 +349,34 @@ function TreeNodeItem({
           <Typography>{node.label}</Typography>
         </Box>
 
-        {/* Values Columns */}
-        {node.values && node.values.length > 0 ? (
+        {/* Values Columns — aligned by period when periods are available */}
+        {periods.length > 0 ? (
+          <>
+            {periods.map((p) => {
+              const matchingValue = (node.values || []).find(v => v.period === p.period);
+              if (matchingValue) {
+                const isSelected = selectedCells.some(
+                  cell => cell.nodeId === node.id && cell.valueId === matchingValue.id
+                );
+                return (
+                  <ValueCell
+                    key={`${p.period}-${matchingValue.id}`}
+                    nodeId={node.id}
+                    value={matchingValue}
+                    isSelected={isSelected}
+                    onSelect={onCellSelect}
+                  />
+                );
+              }
+              return (
+                <Box
+                  key={`${p.period}-empty`}
+                  sx={{ minWidth: 150, flex: '0 0 150px', px: 2, py: 0.5, borderRight: '1px solid #e0e0e0' }}
+                />
+              );
+            })}
+          </>
+        ) : node.values && node.values.length > 0 ? (
           <>
             {node.values.map((value, idx) => {
               const isSelected = selectedCells.some(
@@ -409,6 +438,8 @@ export interface TreeViewProps {
   companyId: string;
   clientId: string;
   getAccessToken: () => Promise<string>;
+  /** Called after a successful save or reload with the latest tree roots and extracted period list. */
+  onSaveComplete?: (roots: TreeNode[], periods: { period: string; periodType: string }[]) => void;
 }
 
 // ── Pending operation types ───────────────────────────────────────────────────
@@ -448,9 +479,13 @@ function applyLocalMerge(roots: TreeNode[], nodeIds: number[], tempId: number): 
   collect(roots);
   if (collected.length < 2) return roots;
 
+  // Use the TARGET (drop-on) node's label. Target is always the last ID in nodeIds.
+  const targetNode = collected.find(n => n.id === nodeIds[nodeIds.length - 1]);
+  const mergedLabel = targetNode ? targetNode.label : collected[collected.length - 1].label;
+
   const merged: TreeNode = {
     id: tempId,
-    label: collected.map(n => n.label).join(' + '),
+    label: mergedLabel,
     values: collected.flatMap(n => n.values || []),
     merged_rows: nodeIds,
     depth: collected[0].depth,
@@ -541,7 +576,7 @@ function buildVisibleNodes(
   return result;
 }
 
-export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps) {
+export function TreeView({ companyId, clientId, getAccessToken, onSaveComplete }: TreeViewProps) {
   // serverTreeData = last-known state from the server (used for discard)
   const [serverTreeData, setServerTreeData] = useState<TreeNode[]>([]);
   // localTreeData = server state + pending local changes (what the UI renders)
@@ -561,16 +596,43 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
   const [selectedCells, setSelectedCells] = useState<CellSelection[]>([]);
   const [deleteMode, setDeleteMode] = useState(false);
   const [selectedNodesForDeletion, setSelectedNodesForDeletion] = useState<Set<string>>(new Set());
+
+  // Compute ordered period columns from tree data
+  const periods = useMemo(() => {
+    const periodMap = new Map<string, string>(); // period => period_type
+    const traverse = (nodes: TreeNode[]) => {
+      for (const n of nodes) {
+        for (const v of (n.values || [])) {
+          if (v.period && !periodMap.has(v.period)) {
+            periodMap.set(v.period, v.period_type || 'unknown');
+          }
+        }
+        traverse(n.children || []);
+      }
+    };
+    traverse(localTreeData);
+    const entries = Array.from(periodMap.entries());
+    // Sort: annual first (ascending year), then ytd / other
+    entries.sort((a, b) => {
+      const typeOrder = (t: string) => (t === 'annual' ? 0 : t === 'ytd' ? 1 : 2);
+      const diff = typeOrder(a[1]) - typeOrder(b[1]);
+      if (diff !== 0) return diff;
+      return a[0].localeCompare(b[0]);
+    });
+    return entries.map(([period, periodType]) => ({ period, periodType }));
+  }, [localTreeData]);
   
   // Partial unmerge dialog state
   const [unmergeDialog, setUnmergeDialog] = useState<{
     open: boolean;
     node: TreeNode | null;
     constituentNodes: string[];
+    constituentLabels: Record<string, string>;
   }>({
     open: false,
     node: null,
     constituentNodes: [],
+    constituentLabels: {},
   });
 
   // Set up token getter
@@ -590,6 +652,27 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
       setPendingOps([]);
       // Expand all nodes by default
       setExpandedNodes(getAllNodeIds(roots));
+
+      // Notify parent with updated tree data + extracted periods
+      if (onSaveComplete) {
+        const periodMap = new Map<string, string>();
+        const walk = (ns: TreeNode[]) => {
+          for (const n of ns) {
+            for (const v of (n.values || [])) {
+              if (v.period && !periodMap.has(v.period)) periodMap.set(v.period, v.period_type || 'unknown');
+            }
+            walk(n.children || []);
+          }
+        };
+        walk(roots);
+        const extractedPeriods = Array.from(periodMap.entries())
+          .sort((a, b) => {
+            const to = (t: string) => (t === 'annual' ? 0 : t === 'ytd' ? 1 : 2);
+            return to(a[1]) - to(b[1]) || a[0].localeCompare(b[0]);
+          })
+          .map(([period, periodType]) => ({ period, periodType }));
+        onSaveComplete(roots, extractedPeriods);
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to load tree structure');
     } finally {
@@ -769,6 +852,7 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
           open: true,
           node,
           constituentNodes: response.constituent_nodes,
+          constituentLabels: response.constituent_labels || {},
         });
       } else {
         // Full unmerge completed
@@ -797,7 +881,7 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
       );
 
       // Close dialog and reload tree
-      setUnmergeDialog({ open: false, node: null, constituentNodes: [] });
+      setUnmergeDialog({ open: false, node: null, constituentNodes: [], constituentLabels: {} });
       await loadTreeStructure();
     } catch (err: any) {
       console.error('❌ Partial unmerge failed:', err);
@@ -1024,6 +1108,44 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
           )}
 
           <Box sx={{ maxHeight: 600, overflow: 'auto' }}>
+            {/* Period column headers */}
+            {periods.length > 0 && visibleNodes.length > 0 && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  py: 0.75,
+                  px: 1,
+                  borderBottom: '2px solid',
+                  borderColor: 'divider',
+                  bgcolor: 'grey.100',
+                  position: 'sticky',
+                  top: 0,
+                  zIndex: 10,
+                }}
+              >
+                {/* Spacer for expand icon + indentation */}
+                <Box sx={{ minWidth: 64 }} />
+                {/* Label header */}
+                <Box sx={{ minWidth: 300, flex: '0 0 300px', pr: 2, borderRight: '1px solid #e0e0e0' }}>
+                  <Typography variant="subtitle2" fontWeight={700}>Account</Typography>
+                </Box>
+                {periods.map((p) => (
+                  <Box
+                    key={p.period}
+                    sx={{ minWidth: 150, flex: '0 0 150px', px: 2, textAlign: 'right', borderRight: '1px solid #e0e0e0' }}
+                  >
+                    <Typography variant="subtitle2" fontWeight={700}>
+                      {p.period}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {p.periodType}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            )}
+
             {visibleNodes.length === 0 ? (
               <Typography color="text.secondary" sx={{ p: 2, textAlign: 'center' }}>
                 No tree structure available. Upload financial data to create nodes.
@@ -1055,6 +1177,7 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
                     deleteMode={deleteMode}
                     isSelectedForDeletion={selectedNodesForDeletion.has(String(node.id))}
                     onToggleSelection={toggleNodeSelection}
+                    periods={periods}
                   />
                   {isMergedNode(node) && !deleteMode && (
                     <Tooltip title="Unmerge this node">
@@ -1091,8 +1214,9 @@ export function TreeView({ companyId, clientId, getAccessToken }: TreeViewProps)
         open={unmergeDialog.open}
         node={unmergeDialog.node}
         constituentNodes={unmergeDialog.constituentNodes}
+        constituentLabels={unmergeDialog.constituentLabels}
         onConfirm={handlePartialUnmerge}
-        onCancel={() => setUnmergeDialog({ open: false, node: null, constituentNodes: [] })}
+        onCancel={() => setUnmergeDialog({ open: false, node: null, constituentNodes: [], constituentLabels: {} })}
       />
     </DndProvider>
   );

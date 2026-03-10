@@ -19,6 +19,7 @@ export interface PartialUnmergeDialogProps {
   open: boolean;
   node: TreeNode | null;
   constituentNodes: string[];
+  constituentLabels?: Record<string, string>;
   onConfirm: (selectedIds: string[]) => void;
   onCancel: () => void;
 }
@@ -27,6 +28,7 @@ export function PartialUnmergeDialog({
   open,
   node,
   constituentNodes,
+  constituentLabels,
   onConfirm,
   onCancel,
 }: PartialUnmergeDialogProps) {
@@ -84,7 +86,7 @@ export function PartialUnmergeDialog({
                       onChange={() => handleToggle(nodeId)}
                     />
                   }
-                  label={`Node: ${nodeId}`}
+                  label={constituentLabels?.[nodeId] || `Node ${nodeId}`}
                 />
               ))}
             </FormGroup>

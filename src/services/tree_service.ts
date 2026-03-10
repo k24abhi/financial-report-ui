@@ -52,6 +52,8 @@ async function treeApiCall<T>(
 export interface TreeNodeValue {
   id: number;
   text: string;
+  period?: string;
+  period_type?: string;
 }
 
 export interface TreeNode {

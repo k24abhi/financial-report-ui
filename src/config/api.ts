@@ -46,6 +46,23 @@ export const API_ENDPOINTS = {
   decideDeal: '/approvals/decide',
   getDeal: '/approvals',
 
+  // Underwriting
+  riskAssessment: '/underwriting/risk_assessment',
+  listRiskAssessments: '/underwriting/risk_assessments',
+  applicationReview: '/underwriting/application_review',
+  underwritingDecision: '/underwriting/decision',
+  listUnderwritingDecisions: '/underwriting/decisions',
+  monitoringFlag: '/underwriting/monitoring/flag',
+  listMonitoringFlags: '/underwriting/monitoring/flags',
+  resolveMonitoringFlag: '/underwriting/monitoring/flags',
+
+  // Compliance
+  complianceCheck: '/compliance/check',
+  listComplianceChecks: '/compliance/checks',
+  addComplianceNote: '/compliance/notes',
+  listComplianceNotes: '/compliance/notes',
+  submitComplianceReview: '/compliance/reviews',
+
   // Health
   health: '/health',
 };

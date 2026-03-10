@@ -4,6 +4,20 @@ import type {
   ExtractedData,
   ClientDetails,
   CompanyDetails,
+  RiskAssessmentRequest,
+  RiskAssessmentResult,
+  ApplicationReviewRequest,
+  ApplicationReviewResult,
+  UnderwritingDecisionRequest,
+  UnderwritingDecisionResult,
+  MonitoringFlagRequest,
+  MonitoringFlagResult,
+  ComplianceCheckRequest,
+  ComplianceCheckResult,
+  ComplianceNoteRequest,
+  ComplianceNoteResult,
+  ComplianceReviewRequest,
+  ComplianceReviewResult,
 } from '../types/interfaces';
 
 // Token getter function - to be set by the app
@@ -402,5 +416,111 @@ export const approvalsAPI = {
 
   async getDeal(deal_id: string): Promise<DealRecord> {
     return apiCall<DealRecord>(`${API_ENDPOINTS.getDeal}/${deal_id}`, { method: 'GET' });
+  },
+};
+
+// ─── Underwriting ─────────────────────────────────────────────────────────────
+
+export const underwritingAPI = {
+  async performRiskAssessment(payload: RiskAssessmentRequest): Promise<RiskAssessmentResult> {
+    return apiCall<RiskAssessmentResult>(API_ENDPOINTS.riskAssessment, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async listRiskAssessments(company_id: string, deal_id: string): Promise<RiskAssessmentResult[]> {
+    return apiCall<RiskAssessmentResult[]>(
+      `${API_ENDPOINTS.listRiskAssessments}/${company_id}/${deal_id}`,
+      { method: 'GET' }
+    );
+  },
+
+  async reviewApplication(payload: ApplicationReviewRequest): Promise<ApplicationReviewResult> {
+    return apiCall<ApplicationReviewResult>(API_ENDPOINTS.applicationReview, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async recordDecision(payload: UnderwritingDecisionRequest): Promise<UnderwritingDecisionResult> {
+    return apiCall<UnderwritingDecisionResult>(API_ENDPOINTS.underwritingDecision, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async listDecisions(company_id: string, deal_id: string): Promise<UnderwritingDecisionResult[]> {
+    return apiCall<UnderwritingDecisionResult[]>(
+      `${API_ENDPOINTS.listUnderwritingDecisions}/${company_id}/${deal_id}`,
+      { method: 'GET' }
+    );
+  },
+
+  async flagForMonitoring(payload: MonitoringFlagRequest): Promise<MonitoringFlagResult> {
+    return apiCall<MonitoringFlagResult>(API_ENDPOINTS.monitoringFlag, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async listMonitoringFlags(company_id: string): Promise<MonitoringFlagResult[]> {
+    return apiCall<MonitoringFlagResult[]>(
+      `${API_ENDPOINTS.listMonitoringFlags}/${company_id}`,
+      { method: 'GET' }
+    );
+  },
+
+  async resolveFlag(flag_id: string): Promise<MonitoringFlagResult> {
+    return apiCall<MonitoringFlagResult>(
+      `${API_ENDPOINTS.resolveMonitoringFlag}/${flag_id}/resolve`,
+      { method: 'PATCH' }
+    );
+  },
+};
+
+// ─── Compliance ───────────────────────────────────────────────────────────────
+
+export const complianceAPI = {
+  async runComplianceCheck(payload: ComplianceCheckRequest): Promise<ComplianceCheckResult> {
+    return apiCall<ComplianceCheckResult>(API_ENDPOINTS.complianceCheck, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async listComplianceChecks(company_id: string, deal_id: string): Promise<ComplianceCheckResult[]> {
+    return apiCall<ComplianceCheckResult[]>(
+      `${API_ENDPOINTS.listComplianceChecks}/${company_id}/${deal_id}`,
+      { method: 'GET' }
+    );
+  },
+
+  async addNote(payload: ComplianceNoteRequest): Promise<ComplianceNoteResult> {
+    return apiCall<ComplianceNoteResult>(API_ENDPOINTS.addComplianceNote, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  },
+
+  async listNotes(company_id: string, deal_id: string): Promise<ComplianceNoteResult[]> {
+    return apiCall<ComplianceNoteResult[]>(
+      `${API_ENDPOINTS.listComplianceNotes}/${company_id}/${deal_id}`,
+      { method: 'GET' }
+    );
+  },
+
+  async submitReview(payload: ComplianceReviewRequest): Promise<ComplianceReviewResult> {
+    return apiCall<ComplianceReviewResult>(API_ENDPOINTS.submitComplianceReview, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
   },
 };
